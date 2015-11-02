@@ -76,8 +76,12 @@ WSGI_APPLICATION = 'securewitness.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'mydatabase',
+	'USER': 'postgres',
+	'PASSWORD': 'popsicle4',
+	'HOST': 'ec2-107-21-221-59.compute-1.amazonaws.com',
+	'PORT': '5432',
     }
 }
 
@@ -104,13 +108,16 @@ STATIC_URL = '/static/'
 # Parse database configuration from $DATABASE_URL
 import dj_database_url
 DATABASES['default'] =  dj_database_url.config()
+DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql_psycopg2'
+DATABASES['default']['NAME'] = 'mydatabase'
+DATABASES['default']['USER'] = 'postgres'
+DATABASES['default']['PASSWORD'] = 'popsicle4'
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
-
 # Static asset configuration
 import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
