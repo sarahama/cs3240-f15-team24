@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
-#from django.core.exceptions import ImproperlyConfigured
-		
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -39,7 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'myapplication',
+    'witness',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -58,7 +56,7 @@ ROOT_URLCONF = 'securewitness.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -81,10 +79,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'securedb',
-		'USER': 'postgres',
-		'PASSWORD': 'syracuse9',
-		'HOST': 'localhost',
-		'PORT': '',
+	'USER': 'postgres',
+	'PASSWORD': 'syracuse9',
+	'HOST': 'localhost',
+	'PORT': '5432',
     }
 }
 
@@ -112,16 +110,15 @@ STATIC_URL = '/static/'
 import dj_database_url
 DATABASES['default'] =  dj_database_url.config()
 DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql_psycopg2'
-DATABASES['default']['NAME'] = 'securedb'
+DATABASES['default']['NAME'] = 'mydatabase'
 DATABASES['default']['USER'] = 'postgres'
-DATABASES['default']['PASSWORD'] = 'syracuse9'
+DATABASES['default']['PASSWORD'] = 'popsicle4'
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
-
 # Static asset configuration
 import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
