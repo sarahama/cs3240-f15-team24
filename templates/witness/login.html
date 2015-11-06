@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_static %}
 
-{% block extrastyle %}{SecureWitness}<link rel="stylesheet" type="text/css" href="{% static "admin/css/login.css" %}" />{% endblock %}
+{% block extrastyle %}<link rel="stylesheet" type="text/css" href="{% static "admin/css/login.css" %}" />{% endblock %}
 
 {% block bodyclass %}{{ block.super }} login{% endblock %}
 
@@ -9,7 +9,7 @@
 
 {% block nav-global %}{% endblock %}
 
-{% block content_title %}{% endblock %}
+{% block content_title %}'Login'{% endblock %}
 
 {% block breadcrumbs %}{% endblock %}
 
@@ -36,7 +36,8 @@
   </div>
   <div>
   <label for="password">Password: </label>
-  <input id = "password" type = "text" name = "password" value="{{current_name}}">
+  <input id = "password" type = "password" name = "password" value="{{current_name}}">
+  <input type="hidden" name="next" value="{{next}}">
   </div>
   <div class="submit-row">
     <label>&nbsp;</label><input type="submit" value="{% trans 'Log in' %}" />
@@ -51,4 +52,3 @@ document.getElementById('id_username').focus()
 </script>
 </div>
 {% endblock %}
-
