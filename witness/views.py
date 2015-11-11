@@ -1,9 +1,11 @@
+from django.shortcuts import HttpResponse
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 from django.contrib import auth
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect
+from django.template import RequestContext, loader
 
 
 from django.http import HttpResponse
@@ -16,6 +18,11 @@ def super(request):
 def home(request):
     return render_to_response("witness/home.html", {'hello': "Hello World"})
 
+def userpage(request):
+    #return HttpResponse("Welcome User")
+    template = loader.get_template('witness/userpage.html')
+    return render(request, 'witness/userpage.html')
+
 def login(request):
     return render_to_response("witness/login.html", {'hello':"Login here"})
     username = request.POST.get('username', '')
@@ -25,11 +32,11 @@ def login(request):
         #correct password, user is active
         auth.login(request, user)
         #direct to success page
-        #return HttpResponseRedirect("/account/loggedin")
+        return HttpResponseRedirect("/witness/userpage.html")
     else:
         #error page
         return HttpResponseRedirect("/account/invalid")
-        #return render_to_response("witness/login.html", {'hello':"Login here"})
+        return render_to_response("witness/login.html", {'hello':"Login here"})
 
 def logout(request):
     auth.logout(request)
