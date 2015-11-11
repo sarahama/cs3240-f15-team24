@@ -3,15 +3,22 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
 from .models import Reporter
+
 # Register your models here.
 
 class ReporterInline(admin.StackedInline):
     model = Reporter
+    list_display = ('username')
 
-class UserAdmin(UserAdmin):
-    inlines = (ReporterInline, )
+#class UserAdmin(UserAdmin):
+#    inlines = (ReporterInline, )
+
+#class ReporterAdmin(ReporterAdmin):
+#    model = Reporter
+#    inlines = [ChoiceInLine]
+#    list_display = ('username')
 
 admin.site.unregister(User)
 admin.site.register(Reporter)
-#admin.site.register(User, UserAdmin)
+admin.site.register(User, UserAdmin)
 

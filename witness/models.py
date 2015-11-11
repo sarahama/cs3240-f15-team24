@@ -3,4 +3,5 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Reporter(models.Model):
+    name = models.CharField(max_length = 50, default= 'nameless')
     user = models.OneToOneField(User)
