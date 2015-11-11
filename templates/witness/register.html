@@ -29,8 +29,7 @@
 {% endif %}
 
 <div id="content-main">
-
-<form action="{{ app_path }}" method="post" id="register-form">{% csrf_token %}
+<form action="/register/" method="POST" id="register-form">{% csrf_token %}
   <div>
   <label for="username">Username: </label>
   <input id = "username" type = "text" name = "username" value="{{current_name}}">
