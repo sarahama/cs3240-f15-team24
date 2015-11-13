@@ -5,4 +5,3 @@ from django.contrib.auth.models import User
 class Reporter(models.Model):
     user = models.OneToOneField(User)
     name = models.CharField(max_length = 50, default= 'nameless')
-    user = models.OneToOneField(User)
