@@ -1,5 +1,5 @@
 from django.shortcuts import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.shortcuts import render_to_response
 from django.contrib import auth
 from django.contrib.auth import authenticate
@@ -12,6 +12,7 @@ from django.template import RequestContext
 from .models import Reporter
 from django.contrib.auth.models import User
 from django.http import HttpResponse
+from .forms import GroupForm
 
 # Create your views here.
 
@@ -22,9 +23,16 @@ def home(request):
     return render_to_response("witness/home.html", {'hello': "Hello World"})
 
 def userpage(request):
-    #return HttpResponse("Welcome User")
-    template = loader.get_template('witness/userpage.html')
+    #username = get_object_or_404(Reporter, pk=name)
     return render(request, 'witness/userpage.html')
+	
+def creategroup(request):
+    context = RequestContext(request)
+    if request.method == 'POST':
+        return render_to_response("witness/userpage.html")
+    else:
+        newForm = GroupForm()
+        return render_to_response('witness/creategroup.html', {'newForm':newForm}, context)
 
 def login(request):
     return render_to_response("witness/login.html", {'hello':"Login here"})
@@ -35,7 +43,7 @@ def login(request):
         #correct password, user is active
         auth.login(request, user)
         #direct to success page
-        return HttpResponseRedirect("/witness/userpage.html")
+        return HttpResponseRedirect("/userpage.html")
     else:
         #error page
         return HttpResponseRedirect("/account/invalid")
@@ -60,7 +68,7 @@ def register(request):
             reporter.save()
             auth.login(request, reporter.user)
             #direct to success page
-            return HttpResponseRedirect("/registration_success")
+            return HttpResponseRedirect("/userpage")
         else:
             #error page
             return HttpResponseRedirect("/account/invalid")
