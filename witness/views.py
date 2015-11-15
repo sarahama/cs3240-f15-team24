@@ -10,7 +10,8 @@ from django.http import HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.template import RequestContext
 from .models import Reporter
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from .forms import GroupForm
 
@@ -29,7 +30,12 @@ def userpage(request):
 def creategroup(request):
     context = RequestContext(request)
     if request.method == 'POST':
-        return render_to_response("witness/userpage.html")
+        group = Group.objects.create(name=request.POST.get('name',''))
+        for username in request.POST.get('other_users', ''):
+            for user in User.objects.all():
+                if (user.username == username):
+                    user.groups.add(group)
+        return HttpResponseRedirect("/userpage")
     else:
         newForm = GroupForm()
         return render_to_response('witness/creategroup.html', {'newForm':newForm}, context)
