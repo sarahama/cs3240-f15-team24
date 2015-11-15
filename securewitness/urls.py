@@ -22,6 +22,7 @@ from django.contrib import admin
 #from django.contrib.auth.views import login, logout
 
 urlpatterns = [
+    url(r'^createreport/', 'report.views.createReport', name='createreport'),
     url(r'^creategroup/', 'witness.views.creategroup', name = 'creategroup'),
     url(r'^userpage/', 'witness.views.userpage', name = 'userpage'),
     url(r'^login/', 'witness.views.login', name = 'login'),

@@ -1,11 +1,14 @@
 from django.contrib import admin
 
-# Register your models here.
-from .models import Report, ReportFolder
+from .models import Report, ReportFolder, File
 from witness.models import Reporter
 
 class ReportAdmin(admin.ModelAdmin):
-     list_distplay = ('report_title','report_short_description','report_long_description', 'report_creation_date', 'report_owner','report_files','report_public')
+    fields = ('report_title','report_short_description','report_long_description', 'report_creation_date', 'report_owner','report_public')
+
+class FolderAdmin(admin.ModelAdmin):
+    fields = ('folder_title', 'report_owner')
+
 
 admin.site.register(Report, ReportAdmin)
-admin.site.register(ReportFolder)
+admin.site.register(ReportFolder, FolderAdmin)

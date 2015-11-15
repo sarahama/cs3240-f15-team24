@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 	<h1> Welcome {{request.user.username}}!</h1>
-	<body>
-		<a href="{% url 'creategroup' %}">Create Report</a>
+    <li><a href="/logout">Logout</a></li>	
+    <body>
+		<a href="{% url 'createreport' %}">Create Report</a>
 		<button type="button">Send Message</button>
 		<h2>Your Groups: </h2>
 		<a href="{% url 'creategroup' %}">Create Group</a>

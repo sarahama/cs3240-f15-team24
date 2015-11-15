@@ -35,19 +35,21 @@ def creategroup(request):
         return render_to_response('witness/creategroup.html', {'newForm':newForm}, context)
 
 def login(request):
-    return render_to_response("witness/login.html", {'hello':"Login here"})
-    username = request.POST.get('username', '')
-    password = request.POST.get('password', '')
-    user = auth.authenticate(username=username, password = password)
-    if user is not None and user.is_active:
-        #correct password, user is active
-        auth.login(request, user)
-        #direct to success page
-        return HttpResponseRedirect("/userpage.html")
-    else:
-        #error page
-        return HttpResponseRedirect("/account/invalid")
-        return render_to_response("witness/login.html", {'hello':"Login here"})
+    
+    if request.method == 'POST':
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        user = auth.authenticate(username=username, password = password)
+        if user is not None and user.is_active:
+            #correct password, user is active
+            auth.login(request, user)
+            #direct to success page
+            return HttpResponseRedirect("/userpage")
+        else:
+            #error page
+            #return HttpResponseRedirect("/account/invalid")
+            return render_to_response("witness/login.html", {'hello':"Login here"})
+    return render_to_response("witness/login.html", RequestContext(request, {}))
 
 def logout(request):
     auth.logout(request)
@@ -79,18 +81,6 @@ def register(request):
 
 def registration_success(request):
     return render_to_response('witness/registration_success.html')
-
-#def register(request):
-#    if request.method == 'POST':
-#        form = UserCreationForm(request.POST)
-#        if form.is_valid():
-#            new_user = form.save()
-#            return HttpResponseRedirect("/books/")
-#    else:
-#        form = UserCreationForm()
-#    return render(request, "registration/register.html", {
-#        'form': form,
-#    })
 
 
 
