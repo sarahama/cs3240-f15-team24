@@ -9,6 +9,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from .forms import ReportForm
+from django.utils import timezone
+from django.db import models
 
 from .models import Report
 
@@ -19,12 +21,12 @@ def createReport(request):
         report_title = request.POST.get('report_title', '')
         report_short_description = request.POST.get('report_short_description', '')
         report_long_description = request.POST.get('report_long_description', '')
-        report_creation_date = request.POST.get('report_creation_date', '')
         report_owner = request.user
         report_public = request.POST.get('report_public', '')
         #create the report
-        newreport = Report(report_title = report_title, report_short_description = report_short_description, report_long_description = report_long_description, report_creation_date = report_creation_date, report_owner = report_owner, report_public = report_public)
+        newreport = Report(report_title = report_title, report_short_description = report_short_description, report_long_description = report_long_description, report_creation_date = timezone.now(), report_owner = report_owner, report_public = report_public)
         newreport.save()
+        return HttpResponseRedirect("/userpage")
     else:
         #display the create report page using the create report form
         form = ReportForm()
