@@ -1,5 +1,6 @@
 securewitness/settings.py
 #Byte-compiled / optimized / DLL files
+__pycache__/
 report/__pycache__/
 witness/migrations/__pycache__/
 witness/__pycache__/
