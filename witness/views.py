@@ -14,6 +14,9 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from .forms import GroupForm
+from .forms import MessageF
+from .models import MessageM
+from django.forms import formset_factory
 
 # Create your views here.
 
@@ -87,6 +90,22 @@ def register(request):
 
 def registration_success(request):
     return render_to_response('witness/registration_success.html')
+
+def get_Message(request):
+    if request.method == 'POST':
+        message1 = MessageF(request.POST)
+        if message1.is_valid():
+            author = request.POST.get('author', '')
+            message = request.POST.get('message','')
+            newmsg = MessageM(author = author, message = message)
+            newmsg.save()
+            results = MessageM.objects.all()
+            #messagetest = message.save()
+            #return HttpResponse('Done')
+            return render(request, 'witness/messaging2.html', {'author': author, 'message': message})
+    else:
+        message = MessageF()
+        return render(request, 'witness/messaging.html', {'message': message})        
 
 
 
