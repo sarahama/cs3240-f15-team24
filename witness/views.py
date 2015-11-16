@@ -17,6 +17,7 @@ from .forms import GroupForm
 from .forms import MessageF
 from .models import MessageM
 from django.forms import formset_factory
+from django.db import models
 
 # Create your views here.
 
