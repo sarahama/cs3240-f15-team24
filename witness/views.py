@@ -27,6 +27,10 @@ def home(request):
 
 def userpage(request):
     #username = get_object_or_404(Reporter, pk=name)
+    #for group in Group.objects.all():
+        #for userGroup in request.user.groups():
+            #if group == userGroup:
+                #pass
     return render(request, 'witness/userpage.html')
 	
 def creategroup(request):
