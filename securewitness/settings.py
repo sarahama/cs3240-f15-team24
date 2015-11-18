@@ -80,10 +80,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'securedb',
-	'USER': 'postgres',
-	'PASSWORD': 'syracuse9',
-	'HOST': 'localhost',
-	'PORT': '5432',
+	    'USER': 'postgres',
+	    'PASSWORD': 'syracuse9',
+	    'HOST': 'localhost',
+	    'PORT': '5432',
     }
 }
 

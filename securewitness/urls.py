@@ -31,5 +31,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^register/', 'witness.views.register', name = 'register'),
     url(r'^registration_success/', 'witness.views.registration_success', name = 'success'),
+    url(r'^messaging/', 'witness.views.get_Message', name = 'messaging'),
+    url(r'^messaging2/', 'witness.views.get_Message', name = 'messaging2'),
     url(r'^$', 'witness.views.home', name='home'),
 ]
