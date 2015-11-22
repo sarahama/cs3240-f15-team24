@@ -13,7 +13,7 @@ from .models import Reporter
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
-from .forms import CreateGroupForm, GroupDisplay
+from .forms import CreateGroupForm, AddGroup
 from .forms import MessageF
 from .models import MessageM
 from django.forms import ModelForm
@@ -34,8 +34,28 @@ def userpage(request):
     #username = get_object_or_404(Reporter, pk=name)
     #return render(request, 'witness/userpage.html')
     context = RequestContext(request)
-    groupDisplay = GroupDisplay(request.POST, request=request)
-    return render_to_response('witness/userpage.html', {'groupDisplay':groupDisplay}, context)
+    addGroup = AddGroup()
+    return render_to_response('witness/userpage.html', {'addGroup':addGroup}, context)
+
+def addgroup(request):
+    context = RequestContext(request)
+    if request.method == 'POST':
+        for group in request.user.groups.all():
+            if group.name == request.POST.get('name',''):
+                for user in User.objects.all():
+                    if user.username == request.POST.get('member',''):
+                        user.groups.add(group)
+        return HttpResponseRedirect("/userpage")
+    else:
+        addGroup = AddGroup()
+        return render_to_response('witness/addgroup.html', {'addGroup':addGroup}, context)
+
+def grouphome(request):
+    context = RequestContext(request)
+    if request.method == 'POST':
+        pass
+    else:
+        return render_to_response('witness/grouphome.html', context)
 	
 def creategroup(request):
     context = RequestContext(request)

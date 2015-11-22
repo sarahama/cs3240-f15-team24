@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html>
+    <h1>Add a Member</h1>
+    <form action="{%  url 'addgroup' %}" method="POST">{% csrf_token %}
+        <p>{{addGroup}}</p>
+        <input type="submit" value="Add Member!">
+    </form>
+</html>

@@ -8,7 +8,13 @@
 		<a href="{% url 'createreport' %}">Create Report</a>
 		<p><a href="{% url 'messaging' %}">Send Messages</a></p>
 		<h2>Your Groups: </h2>
-        <p>{{ request.user.groups.name }}</p>
-		<a href="{% url 'creategroup' %}">Create Group</a>
+        <ul>
+            {% for group in request.user.groups.values %}
+            <a href="{% url 'grouphome' %}">{{group.name}}</a><br><br>
+            {% endfor %}
+        </ul>
+        <h2>Options:</h2>
+		<a href="{% url 'creategroup' %}">Create Group</a><br><br>
+        <a href="{% url 'addgroup' %}">Add Member to Group</a>
     </body>
 </html>
