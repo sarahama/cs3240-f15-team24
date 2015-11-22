@@ -22,3 +22,4 @@ class GroupDisplay(forms.Form):
 		for group in self.request.user.groups():
 			groupList.append(group)
 		groups = forms.MultipleChoiceField(choices = groupList)
+

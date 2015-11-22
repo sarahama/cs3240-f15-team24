@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <h1>Manage Reporters</h1>
+    <li><a href="/logout">Logout</a></li>
+    <form action="{%  url 'adminuser' %}" method="POST">{% csrf_token %}
+        <p><input id = "search" type = "text" name = 'search' value="{{current_name}}">    
+        <button type = 'submit'>Search</button></p>
+    </form>
+    <form action="{%  url 'edituser' %}" method="GET">{% csrf_token %}
+        <ul>
+            {% for reporter in reporterList %}
+            <li>{{reporter.user.username}} <button type = "submit" value = "{{reporter.user.username}}" name = "edit">Edit</button></li>
+        {% endfor %}
+        </ul>
+    </form>
+</html>
+
