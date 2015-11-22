@@ -1,0 +1,18 @@
+<form action="/userpage/" method="post">
+    {% csrf_token %}
+    <br><b>User:</b></br>
+    {{request.user.username}}
+    <br></br>
+    <br><b>Pseudonym:</b></br>
+    {{ author }}
+    <br></br>
+    <br><b>Message:</b></br>
+    {{ message }}
+    <br></br>
+    {% for item in results %}
+    <tr> 
+        <td>{{ item }}</td>
+    </tr>
+    {% endfor %}
+    <input type="submit" value="Ok" />
+</form>

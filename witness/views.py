@@ -14,8 +14,13 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from .forms import GroupForm
+from .forms import MessageF
+from .models import MessageM
+from django.forms import formset_factory
 from django.db import models
+
 from django.forms import ModelForm
+
 # Create your views here.
 
 def super(request):
@@ -92,6 +97,7 @@ def access_error(request):
 def registration_success(request):
     return render_to_response('witness/registration_success.html')
 
+
 def admin_home(request):
     if request.user.is_superuser:
         return render_to_response('witness/admin_home.html')    
@@ -142,6 +148,23 @@ class UserEditForm(ModelForm):
     class Meta:
         model = User
         fields = ['groups', 'is_active', 'is_superuser']
+
+def get_Message(request):
+    if request.method == 'POST':
+        message1 = MessageF(request.POST)
+        if message1.is_valid():
+            author = request.POST.get('author', '')
+            message = request.POST.get('message','')
+            newmsg = MessageM(author = author, message = message)
+            newmsg.save()
+            results = MessageM.objects.all()
+            #messagetest = message.save()
+            #return HttpResponse('Done')
+            return render(request, 'witness/messaging2.html', {'author': author, 'message': message})
+    else:
+        message = MessageF()
+        return render(request, 'witness/messaging.html', {'message': message})        
+
 
 
 
