@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+        <h1> Secure Witness Administration </h1>
+    <body>
+                <a href="{% url 'createreport' %}">Create Report</a>
+                <button type="button">Send Message</button>
+                <h2>Your Groups: </h2>
+                <a href="{% url 'creategroup' %}">Create Group</a>
+                <h2>Manage </h2>
+                <ul>
+                    <li><a href="{% url 'adminuser' %}">Reporters</a></li>
+                </ul>
+    </body>
+</html>

@@ -15,8 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from .forms import GroupForm
 from django.db import models
-
-
+from django.forms import ModelForm
 # Create your views here.
 
 def super(request):
@@ -87,8 +86,62 @@ def register(request):
         return render_to_response("witness/register.html", RequestContext(request, {}))
 
 
+def access_error(request):
+    return render_to_response('witness/no_access.html')
+
 def registration_success(request):
     return render_to_response('witness/registration_success.html')
+
+def admin_home(request):
+    if request.user.is_superuser:
+        return render_to_response('witness/admin_home.html')    
+    else:
+        return render_to_response('witness/no_access.html')
+
+def admin_users(request):
+    context = RequestContext(request)
+    if request.method == 'POST':	
+        search = request.POST.get('search', '')
+        reporters = Reporter.objects.filter(name__contains = search)
+        return render_to_response('witness/admin_reporters.html', {'reporterList':reporters}, context)
+    else:
+        reporters = Reporter.objects.all()
+        return render_to_response('witness/admin_reporters.html', {'reporterList':reporters}, context)
+
+
+
+def admin_edit_user(request):
+    context = RequestContext(request)
+    if request.method == 'GET':
+        reporterName = request.GET.get('edit','')
+        reporter = Reporter.objects.get(name = reporterName)
+        user = User.objects.get(username = reporterName)
+        form = ReporterForm(instance = reporter)
+        form2 = UserEditForm(instance = user)
+        return render_to_response('witness/admin_edit_user.html', { 'reporterName': reporterName, 'form': form, 'form2':form2}, context)
+    elif request.method == 'POST':
+        reporterName = request.POST.get("save")
+        reporter = Reporter.objects.get(name = reporterName)
+        reporter.name = request.POST.get('name', '')
+        reporter.user.username = request.POST.get('name', '')
+        reporter.user.groups = request.POST.get('groups', '')
+        reporter.user.is_active = request.POST.get('is_active', '')
+        reporter.user.is_superuser = request.POST.get('is_superuser', '')
+        reporter.save()
+        reporter.user.save()
+        return render_to_response('witness/admin_edit_user.html', {'response':'User updated successfully'}, context)
+    else:
+        return render_to_response('witness/no_access.html')
+
+class ReporterForm(ModelForm):
+    class Meta:
+        model = Reporter
+        fields = ['name']
+
+class UserEditForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ['groups', 'is_active', 'is_superuser']
 
 
 

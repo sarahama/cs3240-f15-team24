@@ -1,7 +1,9 @@
-<!DOCTYPE html>
 <html>
 	<h1> Welcome {{request.user.username}}!</h1>
-    <li><a href="/logout">Logout</a></li>	
+    <ul><a href="/logout">Logout</a></ul>
+    {% if request.user.is_superuser %}
+    <ul><a href="/adminhome">Admin Home</a></ul>
+    {% endif %}
     <body>
 		<a href="{% url 'createreport' %}">Create Report</a>
 		<button type="button">Send Message</button>

@@ -22,6 +22,10 @@ from django.contrib import admin
 #from django.contrib.auth.views import login, logout
 
 urlpatterns = [
+    url(r'^adminhome/', 'witness.views.admin_home', name = 'adminhome'),
+    url(r'^adminuser/', 'witness.views.admin_users', name = 'adminuser'),
+    url(r'^edituser/', 'witness.views.admin_edit_user', name = 'edituser'),
+    url(r'^accesserror/', 'witness.views.access_error', name = 'errorpage'),
     url(r'^createreport/', 'report.views.createReport', name='createreport'),
     url(r'^creategroup/', 'witness.views.creategroup', name = 'creategroup'),
     url(r'^userpage/', 'witness.views.userpage', name = 'userpage'),

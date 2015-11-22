@@ -9,3 +9,5 @@ class GroupForm(forms.Form):
 		tup_list.append(tup)
 	name = forms.CharField(label="Group Name")
 	other_users = forms.MultipleChoiceField(choices = tup_list)
+
+

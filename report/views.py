@@ -5,7 +5,10 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from django.views.generic import ListView
 
+#import os
+#from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from .forms import ReportForm
@@ -23,8 +26,11 @@ def createReport(request):
         report_long_description = request.POST.get('report_long_description', '')
         report_owner = request.user
         report_public = request.POST.get('report_public', '')
+        #report_file = request.POST.get('report_file', '')
         #create the report
-        newreport = Report(report_title = report_title, report_short_description = report_short_description, report_long_description = report_long_description, report_creation_date = timezone.now(), report_owner = report_owner, report_public = report_public)
+        newreport = Report(report_title = report_title, report_short_description = report_short_description, 
+                    report_long_description = report_long_description, report_creation_date = timezone.now(),
+                    report_owner = report_owner, report_public = report_public)
         newreport.save()
         return HttpResponseRedirect("/userpage")
     else:
@@ -32,3 +38,5 @@ def createReport(request):
         form = ReportForm()
         return render(request, 'reports/createreport.html', {'form':form})
 
+class ReportList(ListView):
+    model = Report
