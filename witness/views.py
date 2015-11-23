@@ -114,7 +114,15 @@ def admin_users(request):
         reporters = Reporter.objects.all()
         return render_to_response('witness/admin_reporters.html', {'reporterList':reporters}, context)
 
-
+def admin_reports(request):
+    context = RequestContext(request)
+    if request.method == 'POST':
+        search = request.POST.get('search', '')
+        reports = Report.objects.filter(name__contains = search)
+        return render_to_response('witness/admin_reports.html', {'reportList':reports}, context)
+    else:
+        reports = Report.objects.all()
+        return render_to_response('witness/admin_reports.html', {'reportList':reports}, context)
 
 def admin_edit_user(request):
     context = RequestContext(request)

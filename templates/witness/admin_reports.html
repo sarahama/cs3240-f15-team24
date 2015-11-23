@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <h1>Manage Reports</h1>
+    <li><a href="/logout">Logout</a></li>
+    <form action="{%  url 'adminreports' %}" method="POST">{% csrf_token %}
+        <p><input id = "search" type = "text" name = 'search' value="{{current_name}}">
+        <button type = 'submit'>Search</button></p>
+    </form>
+    <form action="{%  url 'viewreport' %}" method="GET">{% csrf_token %}
+        <ul>
+            {% for report in reportList %}
+            <li>{{report.title}} <button type = "submit" value = "{{report.title}}" name = "view">View</button></li>
+        {% endfor %}
+        </ul>
+    </form>
+</html>
