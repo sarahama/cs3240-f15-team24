@@ -2,17 +2,12 @@
     {% csrf_token %}
     <br><b>User:</b></br>
     {{request.user.username}}
-    <br></br>
-    <br><b>Intended Reader:</b></br>
-    {{ reader }}
-    <br></br>
-    <br><b>Message:</b></br>
-    {{ message }}
-    <br></br>
+    <br><b>Your Messages:</b></br>
     {% for i in results %}
-    {% if reader == i.reader %}
+    {% if request.user.username == i.reader %}
     <tr> 
         <td>{{ i.message }}</td>
+        <br></br>
     </tr>
     {% endif %}
     {% endfor %}

@@ -7,6 +7,7 @@
     <body>
 		<a href="{% url 'createreport' %}">Create Report</a>
 		<p><a href="{% url 'messaging' %}">Send Messages</a></p>
+        <p><a href="{% url 'messaging3' %}">View Your Messages</a></p>
 		<h2>Your Groups: </h2>
         <ul>
             {% for group in request.user.groups.values %}
