@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html>
-    <h1>View Reports</h1>
+    <h1>{{reportTitle}}</h1>
     <li><a href="/logout">Logout</a></li>
+    {% if request.user.is_superuser %}
     <li><a href="/adminhome">Admin home</a></li>
-    <p>{{report.title}}</p>
+    {% endif %}
+    <p>Title: {{reportTitle}}</p>
+    <p>Short description: {{reportShort}}</p>
+    <p>Long description: {{reportLong}}</p>
+    <p>Created: {{created}}</p>
+    <p>Public: {{public}}</p>
 </html>

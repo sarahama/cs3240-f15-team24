@@ -24,6 +24,8 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^adminhome/', 'witness.views.admin_home', name = 'adminhome'),
     url(r'^adminuser/', 'witness.views.admin_users', name = 'adminuser'),
+    url(r'^adminreports/', 'witness.views.admin_reports', name = 'adminreports'),
+    url(r'^adminviewreport/', 'witness.views.admin_view_report', name = 'adminviewreport'),
     url(r'^edituser/', 'witness.views.admin_edit_user', name = 'edituser'),
     url(r'^accesserror/', 'witness.views.access_error', name = 'errorpage'),
     url(r'^createreport/', 'report.views.createReport', name='createreport'),
@@ -31,6 +33,8 @@ urlpatterns = [
     url(r'^addgroup/', 'witness.views.addgroup', name = 'addgroup'),
     url(r'^grouphome/', 'witness.views.grouphome', name = 'grouphome'),
     url(r'^userpage/', 'witness.views.userpage', name = 'userpage'),
+    url(r'^userreports', 'witness.views.user_reports', name = 'userreports'),
+    url(r'^userviewreport', 'witness.views.user_view_report', name = 'userviewreport'),
     url(r'^login/', 'witness.views.login', name = 'login'),
     url(r'^logout/', 'witness.views.logout', name = 'logout'),
     url(r'^super/', 'witness.views.super', name = 'super'),

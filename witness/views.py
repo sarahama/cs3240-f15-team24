@@ -19,6 +19,7 @@ from .models import MessageM
 from django.forms import ModelForm
 from django.forms import formset_factory
 from django.db import models
+from report.models import Report
 
 from django.forms import ModelForm
 
@@ -37,6 +38,33 @@ def userpage(request):
     addGroup = AddGroup()
     return render_to_response('witness/userpage.html', {'addGroup':addGroup}, context)
 
+def user_reports(request):
+    context = RequestContext(request)
+    if request.method == 'POST':
+        search = request.POST.get('search', '')
+        reports = Report.objects.filter(report_title__contains = search, report_owner__exact = request.user)
+        return render_to_response('witness/user_reports.html', {'reportList':reports}, context)
+    else:
+        reports = Report.objects.filter(report_owner__exact = request.user)
+        return render_to_response('witness/user_reports.html', {'reportList':reports}, context)
+
+def user_view_report(request):
+    context = RequestContext(request)
+    if request.method == 'GET':
+        reportTitle = request.GET.get("view", '')
+        report = Report.objects.get(report_title = reportTitle)
+        reportTitle = report.report_title
+        reportShort = report.report_short_description
+        reportLong = report.report_long_description
+        created = report.report_creation_date
+        owner = report.report_owner
+        public = report.report_public
+        return render_to_response('witness/admin_view_report.html', {'reportTitle': reportTitle,
+        'reportShort': reportShort, 'reportLong':reportLong, 'created':created, 'owner': owner, 'public':public}, context)
+    else:
+        reports = Report.objects.all()
+        return render_to_response('witness/admin_reports.html', {'reportList':reports}, context)
+    
 def addgroup(request):
     context = RequestContext(request)
     if request.method == 'POST':
@@ -141,8 +169,25 @@ def admin_reports(request):
     context = RequestContext(request)
     if request.method == 'POST':
         search = request.POST.get('search', '')
-        reports = Report.objects.filter(name__contains = search)
+        reports = Report.objects.filter(report_title__contains = search)
         return render_to_response('witness/admin_reports.html', {'reportList':reports}, context)
+    else:
+        reports = Report.objects.all()
+        return render_to_response('witness/admin_reports.html', {'reportList':reports}, context)
+
+def admin_view_report(request):
+    context = RequestContext(request)
+    if request.method == 'GET':
+        reportTitle = request.GET.get("view", '')
+        report = Report.objects.get(report_title = reportTitle)
+        reportTitle = report.report_title
+        reportShort = report.report_short_description
+        reportLong = report.report_long_description
+        created = report.report_creation_date
+        owner = report.report_owner
+        public = report.report_public
+        return render_to_response('witness/admin_view_report.html', {'reportTitle': reportTitle,
+        'reportShort': reportShort, 'reportLong':reportLong, 'created':created, 'owner': owner, 'public':public}, context)
     else:
         reports = Report.objects.all()
         return render_to_response('witness/admin_reports.html', {'reportList':reports}, context)
