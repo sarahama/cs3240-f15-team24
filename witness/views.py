@@ -20,10 +20,12 @@ from django.forms import ModelForm
 from django.forms import formset_factory
 from django.db import models
 from report.models import Report
-
+from django.views.generic.edit import UpdateView
 from django.forms import ModelForm
 from .ecryption import encrypt
 from .ecryption import decrypt
+from report.forms import ReportForm
+
 
 # Create your views here.
 
@@ -61,8 +63,10 @@ def user_view_report(request):
         created = report.report_creation_date
         owner = report.report_owner
         public = report.report_public
+        document = report.report_file
+        encrypt = report.report_file_encryption
         return render_to_response('witness/admin_view_report.html', {'reportTitle': reportTitle,
-        'reportShort': reportShort, 'reportLong':reportLong, 'created':created, 'owner': owner, 'public':public}, context)
+        'reportShort': reportShort, 'reportLong':reportLong, 'created':created, 'owner': owner, 'public':public, 'document':document, 'encrypt':encrypt}, context)
     else:
         reports = Report.objects.all()
         return render_to_response('witness/admin_reports.html', {'reportList':reports}, context)
@@ -188,8 +192,10 @@ def admin_view_report(request):
         created = report.report_creation_date
         owner = report.report_owner
         public = report.report_public
+        document = report.report_file
+        encrypt = report.report_file_encryption
         return render_to_response('witness/admin_view_report.html', {'reportTitle': reportTitle,
-        'reportShort': reportShort, 'reportLong':reportLong, 'created':created, 'owner': owner, 'public':public}, context)
+        'reportShort': reportShort, 'reportLong':reportLong, 'created':created, 'owner': owner, 'public':public, 'document':document,'encrypt':encrypt}, context)
     else:
         reports = Report.objects.all()
         return render_to_response('witness/admin_reports.html', {'reportList':reports}, context)
@@ -246,7 +252,32 @@ def get_Message(request):
             return render(request, 'witness/messaging2.html', {'reader': reader, 'message': message, 'results': results})
     else:
         message = MessageF()
-        return render(request, 'witness/messaging.html', {'message': message})       
+        return render(request, 'witness/messaging.html', {'message': message})            
+
+def user_edit_report(request):
+    context = RequestContext(request)
+    if request.method == 'GET':
+        report_Title = request.GET.get('edit','')
+        report = Report.objects.get(report_title = report_Title)
+        form = ReportEditForm(instance = report)
+        return render_to_response('witness/user_edit_report.html', {'form':form, 'report_Title':report_Title}, context)
+    elif request.method == 'POST':
+        report_Title = request.POST.get("save")
+        report = Report.objects.get(report_title = report_Title)
+        report.report_title = request.POST.get('report_title', '')
+        report.report_short_description = request.POST.get('report_short_description', '')
+        report.report_long_description = request.POST.get('report_long_description', '')
+        report.report_public = request.POST.get('report_public', '')
+        report.report_file_encryption = request.POST.get('report_file_encryption', '')
+        report.report_file = request.POST.get('report_file', '')
+        report.save()
+        return render_to_response('witness/user_edit_report.html', {'response':'Report updated successfully'}, context)
+   
+
+class ReportEditForm(ModelForm):
+    class Meta:
+        model = Report
+        fields = ['report_title', 'report_short_description','report_long_description', 'report_public', 'report_file_encryption', 'report_file']
 
 def msg3(request):
     if request.method == 'GET':

@@ -10,7 +10,6 @@ class Reporter(models.Model):
         return self.name
 
 
-
 class MessageM(models.Model):
 	#user = models.CharField(max_length=40)
 	reader = models.CharField(max_length=40)

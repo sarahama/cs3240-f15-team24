@@ -19,6 +19,7 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.conf.urls import *
 #from django.contrib.auth.views import login, logout
 
 urlpatterns = [
@@ -27,6 +28,7 @@ urlpatterns = [
     url(r'^adminreports/', 'witness.views.admin_reports', name = 'adminreports'),
     url(r'^adminviewreport/', 'witness.views.admin_view_report', name = 'adminviewreport'),
     url(r'^edituser/', 'witness.views.admin_edit_user', name = 'edituser'),
+    url(r'^editreport/', 'witness.views.user_edit_report', name = 'editreport'),
     url(r'^accesserror/', 'witness.views.access_error', name = 'errorpage'),
     url(r'^createreport/', 'report.views.createReport', name='createreport'),
     url(r'^creategroup/', 'witness.views.creategroup', name = 'creategroup'),

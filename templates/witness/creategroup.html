@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+	<ul><a href="/userpage">Home</a></ul>
     <h1>Create a Group</h1>
     <form action="{%  url 'creategroup' %}" method="POST">{% csrf_token %}
         <p>{{newForm}}</p>
