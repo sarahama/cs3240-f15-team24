@@ -9,8 +9,10 @@ class Reporter(models.Model):
     def __str__(self):
         return self.name
 
+
 class MessageM(models.Model):
-	author = models.CharField(max_length=40)
+	#user = models.CharField(max_length=40)
+	reader = models.CharField(max_length=40)
 	message = models.TextField()
 	def __str__(self):
-		return self.author
+		return self.reader

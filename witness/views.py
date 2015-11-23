@@ -22,7 +22,10 @@ from django.db import models
 from report.models import Report
 from django.views.generic.edit import UpdateView
 from django.forms import ModelForm
+from .ecryption import encrypt
+from .ecryption import decrypt
 from report.forms import ReportForm
+
 
 # Create your views here.
 
@@ -234,17 +237,22 @@ def get_Message(request):
     if request.method == 'POST':
         message1 = MessageF(request.POST)
         if message1.is_valid():
-            author = request.POST.get('author', '')
+            reader = request.POST.get('reader', '')
             message = request.POST.get('message','')
-            newmsg = MessageM(author = author, message = message)
+            if 'encmsg' in request.POST:
+                #message = str(message)
+                message = encrypt(message, "testing", "moretesting")
+                message = str(message)
+            #user = request.user.username
+            newmsg = MessageM(reader = reader, message = message)
             newmsg.save()
             results = MessageM.objects.all()
             #messagetest = message.save()
             #return HttpResponse('Done')
-            return render(request, 'witness/messaging2.html', {'author': author, 'message': message})
+            return render(request, 'witness/messaging2.html', {'reader': reader, 'message': message, 'results': results})
     else:
         message = MessageF()
-        return render(request, 'witness/messaging.html', {'message': message})        
+        return render(request, 'witness/messaging.html', {'message': message})            
 
 def user_edit_report(request):
     context = RequestContext(request)
@@ -271,5 +279,10 @@ class ReportEditForm(ModelForm):
         model = Report
         fields = ['report_title', 'report_short_description','report_long_description', 'report_public', 'report_file_encryption', 'report_file']
 
-
+def msg3(request):
+    if request.method == 'GET':
+        results = MessageM.objects.all()
+        return render(request, 'witness/messaging3.html', {'results': results})
+    else:
+        return HttpResponseRedirect("/userpage")
 

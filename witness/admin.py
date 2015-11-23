@@ -19,7 +19,7 @@ class ReporterInline(admin.StackedInline):
 #    list_display = ('username')
 
 class MessageAdmin(admin.ModelAdmin):
-	fields = ('author', 'message')
+	fields = ('reader', 'message')
 
 admin.site.register(MessageM, MessageAdmin)
 admin.site.unregister(User)
