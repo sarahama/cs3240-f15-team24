@@ -1,15 +1,9 @@
 from django import forms
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from .models import MessageM
 
-class GroupForm(forms.Form):
-	userList = User.objects.all()
-	tup_list = []
-	for user in userList:
-		tup = (user.id, user.username)
-		tup_list.append(tup)
+class CreateGroupForm(forms.Form):
 	name = forms.CharField(label="Group Name")
-	other_users = forms.MultipleChoiceField(choices = tup_list)
 
 
 class MessageF(forms.ModelForm):
@@ -17,3 +11,6 @@ class MessageF(forms.ModelForm):
 		model = MessageM
 		fields = "__all__"
 
+class AddGroup(forms.Form):
+	name = forms.CharField(label="Group Name")
+	member = forms.CharField(label="User to add")

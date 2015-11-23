@@ -13,9 +13,10 @@ from .models import Reporter
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
-from .forms import GroupForm
+from .forms import CreateGroupForm, AddGroup
 from .forms import MessageF
 from .models import MessageM
+from django.forms import ModelForm
 from django.forms import formset_factory
 from django.db import models
 
@@ -31,19 +32,41 @@ def home(request):
 
 def userpage(request):
     #username = get_object_or_404(Reporter, pk=name)
-    return render(request, 'witness/userpage.html')
+    #return render(request, 'witness/userpage.html')
+    context = RequestContext(request)
+    addGroup = AddGroup()
+    return render_to_response('witness/userpage.html', {'addGroup':addGroup}, context)
+
+def addgroup(request):
+    context = RequestContext(request)
+    if request.method == 'POST':
+        for group in request.user.groups.all():
+            if group.name == request.POST.get('name',''):
+                for user in User.objects.all():
+                    if user.username == request.POST.get('member',''):
+                        user.groups.add(group)
+        return HttpResponseRedirect("/userpage")
+    else:
+        addGroup = AddGroup()
+        return render_to_response('witness/addgroup.html', {'addGroup':addGroup}, context)
+
+def grouphome(request):
+    context = RequestContext(request)
+    if request.method == 'POST':
+        pass
+    else:
+        return render_to_response('witness/grouphome.html', context)
 	
 def creategroup(request):
     context = RequestContext(request)
     if request.method == 'POST':
         group = Group.objects.create(name=request.POST.get('name',''))
-        for username in request.POST.get('other_users', ''):
-            for user in User.objects.all():
-                if (user.username == username):
-                    user.groups.add(group)
+        group.save()
+        request.user.groups.add(group)
+        group.save()
         return HttpResponseRedirect("/userpage")
     else:
-        newForm = GroupForm()
+        newForm = CreateGroupForm()
         return render_to_response('witness/creategroup.html', {'newForm':newForm}, context)
 
 def login(request):
