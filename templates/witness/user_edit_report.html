@@ -1,0 +1,10 @@
+<html>
+        <h1> Edit {{report_Title}} </h1>
+    <ul><a href="/logout">Logout</a></ul>
+    <ul><a href="/userpage">Home</a></ul>
+    <form action="{%  url 'editreport' %}" method="POST">{% csrf_token %}
+        <p>{{form}}</p>
+        <button type="submit" value= '{{report_Title}}' name = "save">Save</button>
+    </form>
+        <p>{{response}}</p>
+</html>

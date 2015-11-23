@@ -2,6 +2,7 @@
 <html>
     <h1>View Reports</h1>
     <li><a href="/logout">Logout</a></li>
+    <ul><a href="/userpage">Home</a></ul>
     <form action="{%  url 'userreports' %}" method="POST">{% csrf_token %}
         <p><input id = "search" type = "text" name = 'search' value="{{current_name}}">
         <button type = 'submit'>Search</button></p>
@@ -9,7 +10,9 @@
     <form action="{%  url 'userviewreport' %}" method="GET">{% csrf_token %}
         <ul>
             {% for report in reportList %}
-            <li>{{report.report_title}} <button type = "submit" value = "{{report.report_title}}" name = "view">View</button></li>
+            <li>{{report.report_title}} <button type = "submit" value = "{{report.report_title}}" name = "view">View</button> </form>
+    <form action="{%  url 'editreport' %}" method="GET">{% csrf_token %}
+            <button type = "submit" value = "{{report.report_title}}" name = "edit">Edit</button></li>
         {% endfor %}
         </ul>
     </form>

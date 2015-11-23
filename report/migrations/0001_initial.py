@@ -13,19 +13,37 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Report',
+            name='File',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
-                ('title', models.CharField(max_length=200)),
-                ('pub_date', models.DateTimeField(verbose_name='date published')),
-                ('owner', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('id', models.AutoField(auto_created=True, serialize=False, verbose_name='ID', primary_key=True)),
+                ('document', models.FileField(default='unknown', upload_to='documents/%Y/%m/%d')),
             ],
         ),
         migrations.CreateModel(
-            name='Reporter',
+            name='Report',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
-                ('name', models.CharField(max_length=64)),
+                ('id', models.AutoField(auto_created=True, serialize=False, verbose_name='ID', primary_key=True)),
+                ('report_title', models.CharField(max_length=64)),
+                ('report_short_description', models.TextField(max_length=500)),
+                ('report_long_description', models.TextField(blank=True)),
+                ('report_creation_date', models.DateTimeField(verbose_name='date published')),
+                ('report_public', models.BooleanField(default=False)),
+                ('report_file', models.FileField(upload_to='media')),
+                ('report_owner', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
+        ),
+        migrations.CreateModel(
+            name='ReportFolder',
+            fields=[
+                ('id', models.AutoField(auto_created=True, serialize=False, verbose_name='ID', primary_key=True)),
+                ('folder_title', models.CharField(max_length=200)),
+                ('folder_creation_date', models.DateTimeField(verbose_name='date published')),
+                ('folder_owner', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.AddField(
+            model_name='file',
+            name='report',
+            field=models.ForeignKey(to='report.Report'),
         ),
     ]

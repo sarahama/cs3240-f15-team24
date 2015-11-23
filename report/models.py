@@ -19,8 +19,10 @@ class Report(models.Model):
     report_long_description = models.TextField(blank = True)
     report_creation_date = models.DateTimeField('date published')
     report_owner = models.ForeignKey('auth.User')
-    #report_files = models.FileField(upload_to = 'files')
     report_public = models.BooleanField(default = False)
+    report_file = models.FileField(upload_to = 'media')
+    report_file_encryption = models.BooleanField(default = False)
+
     #report_folder = models.ForeignKey(ReportFolder)
     def __str__(self):
         return self.report_title

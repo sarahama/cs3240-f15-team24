@@ -11,26 +11,30 @@ from django.views.generic import ListView
 #from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
-from .forms import ReportForm
 from django.utils import timezone
 from django.db import models
-
 from .models import Report
+from .forms import ReportForm
+
 
 def createReport(request):
     
     if request.method == "POST":
         #Create and save the report
+        form = ReportForm(request.POST, request.FILES)
+        #if form.is_valid():
         report_title = request.POST.get('report_title', '')
         report_short_description = request.POST.get('report_short_description', '')
         report_long_description = request.POST.get('report_long_description', '')
         report_owner = request.user
         report_public = request.POST.get('report_public', '')
-        #report_file = request.POST.get('report_file', '')
-        #create the report
+        report_file = request.FILES['report_file']
+        report_file_encryption = request.POST.get('report_file_encryption', '')
+            #report_file = request.POST.get('report_file', '')
+            #create the report
         newreport = Report(report_title = report_title, report_short_description = report_short_description, 
                     report_long_description = report_long_description, report_creation_date = timezone.now(),
-                    report_owner = report_owner, report_public = report_public)
+                    report_owner = report_owner, report_public = report_public, report_file = report_file, report_file_encryption = report_file_encryption)
         newreport.save()
         return HttpResponseRedirect("/userpage")
     else:
@@ -38,5 +42,3 @@ def createReport(request):
         form = ReportForm()
         return render(request, 'reports/createreport.html', {'form':form})
 
-class ReportList(ListView):
-    model = Report
