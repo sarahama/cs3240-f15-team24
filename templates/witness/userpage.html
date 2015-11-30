@@ -15,13 +15,18 @@
             <a href="{% url 'grouphome' %}">{{group.name}}</a><br><br>
             {% endfor %}
         <h3>Group Options:</h2>
+        <a href="{% url 'addgroup' %}">Add Member to Group</a><br><br>
         <a href="{% url 'creategroup' %}">Create Group</a><br><br>
-        <a href="{% url 'addgroup' %}">Add Member to Group</a>
         </ul>
+        <h2>Folders: </h2>
+        <ul>
+        <a href="{% url 'userfolders' %}">Browse Folders</a><br><br>    
+        <a href="{% url 'createfolder' %}">Create Folder</a><br><br>
+        </ul> 
         <h2>Reports: </h2>
         <ul>
+        <a href="{% url 'userreports' %}">View reports</a><br><br>
         <a href="{% url 'createreport' %}">Create Report</a><br><br>
-        <a href="{% url 'userreports' %}">View reports</a>
-        
+        </ul>
     </body>
 </html>

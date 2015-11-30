@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <h1>View Folders</h1>
+    <p><a href="/logout">Logout</a></p>
+    <p><a href="/userpage">Home</a></p>
+    <form action="{%  url 'userfolders' %}" method="POST">{% csrf_token %}
+        <p><input id = "search" type = "text" name = 'search' value="{{current_name}}">
+        <button type = 'submit'>Search</button></p>
+    </form>
+    
+        <ul>
+            {% for folder in folderList %}
+            <form action="{%  url 'userviewfolders' %}" method="GET">{% csrf_token %}
+            {{folder.folder_title}} <button type = "submit" value = "{{folder.folder_title}}" name = "view">View</button> </form>
+            {% endfor %}
+        </ul>
+</html>

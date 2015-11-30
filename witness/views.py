@@ -25,6 +25,8 @@ from django.forms import ModelForm
 from .ecryption import encrypt
 from .ecryption import decrypt
 from report.forms import ReportForm
+from report.models import ReportFolder
+from itertools import chain
 
 
 # Create your views here.
@@ -45,12 +47,53 @@ def userpage(request):
 def user_reports(request):
     context = RequestContext(request)
     if request.method == 'POST':
-        search = request.POST.get('search', '')
-        reports = Report.objects.filter(report_title__contains = search, report_owner__exact = request.user)
-        return render_to_response('witness/user_reports.html', {'reportList':reports}, context)
+        if request.POST.get('filter','') == 'go':
+            reports = []
+            if request.POST.get('myreports',''):
+                reports = Report.objects.filter(report_owner__exact = request.user)
+            all_reports = Report.objects.all()
+            access = []
+            for report in all_reports:
+                group_name = report.report_group
+                #add the report if the user is an a group that can view the report
+                if request.POST.get('groupaccess',''):
+                    if request.user.groups.filter(name = group_name).exists() and report not in reports:
+                        access.append(report) 
+                #add the report if it is public
+                if request.POST.get('public',''):
+                    if report.report_public and report not in reports and report not in access:
+                        access.append(report)
+            final = list(chain(reports, access))
+            return render_to_response('witness/user_reports.html', {'reportList':final}, context)
+        else:
+            search = request.POST.get('search', '')
+            reports = Report.objects.filter(report_title__contains = search, report_owner__exact = request.user)
+            all_reports = Report.objects.filter(report_title__contains = search)
+            access = []
+            for report in all_reports:
+                group_name = report.report_group
+                #add the report if the user is an a group that can view the report
+                if request.user.groups.filter(name = group_name).exists() and report not in reports:
+                    access.append(report) 
+                #add the report if it is public
+                if report.report_public and report not in reports and report not in access:
+                    access.append(report)
+            final = list(chain(reports, access))
+            return render_to_response('witness/user_reports.html', {'reportList':final}, context)
     else:
         reports = Report.objects.filter(report_owner__exact = request.user)
-        return render_to_response('witness/user_reports.html', {'reportList':reports}, context)
+        all_reports = Report.objects.all()
+        access = []
+        for report in all_reports:
+            group_name = report.report_group
+            #add the report if the user is an a group that can view the report
+            if request.user.groups.filter(name = group_name).exists() and report not in reports:
+                access.append(report)
+            #add the report if it is public
+            if report.report_public and report not in reports and report not in access:
+                access.append(report)
+        final = list(chain(reports, access))
+        return render_to_response('witness/user_reports.html', {'reportList':final}, context)
 
 def user_view_report(request):
     context = RequestContext(request)
@@ -60,17 +103,134 @@ def user_view_report(request):
         reportTitle = report.report_title
         reportShort = report.report_short_description
         reportLong = report.report_long_description
+        reportGroup = report.report_group
         created = report.report_creation_date
         owner = report.report_owner
         public = report.report_public
         document = report.report_file
         encrypt = report.report_file_encryption
         return render_to_response('witness/admin_view_report.html', {'reportTitle': reportTitle,
-        'reportShort': reportShort, 'reportLong':reportLong, 'created':created, 'owner': owner, 'public':public, 'document':document, 'encrypt':encrypt}, context)
+        'reportShort': reportShort, 'reportGroup':reportGroup, 'reportLong':reportLong, 'created':created, 'owner': owner, 'public':public, 'document':document, 'encrypt':encrypt}, context)
     else:
-        reports = Report.objects.all()
-        return render_to_response('witness/admin_reports.html', {'reportList':reports}, context)
+        reports = Report.objects.filter(report_owner__exact = request.user)
+        return render_to_response('witness/user_reports.html', {'reportList':reports}, context)
+
+def deleted_report(request):
+    context = RequestContext(request)
+    if request.method == 'POST' and not request.user.is_superuser:
+        reportTitle = request.POST.get('delete', '')
+        report = Report.objects.get(report_owner__exact = request.user, report_title__exact = reportTitle)
+        report.delete()
+        return render_to_response('reports/deleted_report.html', {'reportTitle':reportTitle}, context)
+    elif request.method == 'POST' and request.user.is_superuser:
+        reportTitle = request.POST.get('delete', '')
+        report = Report.objects.get(report_title__exact = reportTitle)
+        report.delete()
+        return render_to_response('reports/deleted_report.html', {'reportTitle':reportTitle}, context)
+
+def user_folders(request):
+    context = RequestContext(request)
+    if request.method == 'POST' and request.POST.get('delete', '') != '':
+        deletefolder = request.POST.get('delete', '')
+        folder = ReportFolder.objects.get(folder_title__exact = deletefolder, folder_owner__exact = request.user)
+        folder.delete()
+        folders = ReportFolder.objects.filter(folder_owner__exact = request.user)
+        return render_to_response('witness/user_folders.html', {'folderList':folders}, context)
+    elif request.method == 'POST':
+        search = request.POST.get('search', '')
+        folders = ReportFolder.objects.filter(folder_title__contains = search, folder_owner__exact = request.user)
+        return render_to_response('witness/user_folders.html', {'folderList':folders}, context)
+    else:
+        folders = ReportFolder.objects.filter(folder_owner__exact = request.user)
+        return render_to_response('witness/user_folders.html', {'folderList':folders}, context)
     
+def user_view_folders(request):
+    context = RequestContext(request)
+    invalid_report = False
+    if request.method == 'GET':
+        folderTitle = request.GET.get("view", '')
+        folder = ReportFolder.objects.get(folder_title = folderTitle, folder_owner__exact = request.user)
+        folderTitle = folder.folder_title
+        reports = folder.folder_reports
+        report_list2 = []
+        if reports != '':
+            report_list = reports.split(',')
+            for report in report_list:
+                if report != '':
+                    if Report.objects.filter(report_title = report).exists():
+                        report_inst = Report.objects.get(report_title = report)
+                        report_list2.append(report_inst)
+                    else:
+                        folder.folder_reports = folder.folder_reports.replace(report, '', 1)
+        return render_to_response('witness/user_view_folders.html', {'folderTitle': folderTitle, 'reportList':report_list2}, context)
+    elif request.method == 'POST' and request.POST.get('edit2', '') != '':
+        addreport = request.POST.get('addreport','')
+        folderTitle = request.POST.get('edit2', '')
+        remove = request.POST.get('removereport','')
+        folder = ReportFolder.objects.get(folder_title = folderTitle, folder_owner__exact = request.user)
+        report_list = folder.folder_reports.split(',')
+        if addreport not in report_list:
+            if Report.objects.filter(report_owner__exact = request.user).filter(report_title__exact = addreport).exists():
+                folder.folder_reports = folder.folder_reports + ',' + addreport
+                folder.save()
+            elif addreport != '':    
+                invalid_report = True
+        if remove in report_list:
+            remove = remove
+            folder.folder_reports = folder.folder_reports.replace(remove, '', 1)
+            folder.save()
+        report_list2 = []
+        reports = folder.folder_reports
+        if reports != '':
+            report_list = reports.split(',')
+            for report in report_list:
+                if report != '':
+                    if Report.objects.filter(report_title = report).exists():
+                        report_inst = Report.objects.get(report_title = report)
+                        report_list2.append(report_inst)
+                    else:
+                        folder.folder_reports = folder.folder_reports.replace(report, '', 1)
+        return render_to_response('witness/user_view_folders.html', {'folderTitle': folderTitle, 'reportList':report_list2, 'invalid_report':invalid_report, 'report_name':addreport}, context)
+    elif request.method == 'POST' and request.POST.get('rename','') != '':
+        folderTitle = request.POST.get('rename', '')
+        folder = ReportFolder.objects.get(folder_title = folderTitle, folder_owner__exact = request.user)
+        newName = request.POST.get('renamefolder', '')
+        if not ReportFolder.objects.filter(folder_title = newName).filter(folder_owner = request.user).exists() or newName == folderTitle:
+            folder.folder_title = newName
+            folder.save()
+            #display the updated folder
+            folderTitle = folder.folder_title
+            reports = folder.folder_reports
+            report_list2 = []
+            if reports != '':
+                report_list = reports.split(',')
+                for report in report_list:
+                    if report != '':
+                        if Report.objects.filter(report_title = report).exists():
+                            report_inst = Report.objects.get(report_title = report)
+                            report_list2.append(report_inst)
+                        else:
+                            folder.folder_reports = folder.folder_reports.replace(report, '', 1)
+
+            return render_to_response('witness/user_view_folders.html', {'folderTitle': folderTitle, 'reportList':report_list2}, context)
+        else:
+            reports = folder.folder_reports
+            report_list2 = []
+            if reports != '':
+                report_list = reports.split(',')
+                for report in report_list:
+                    if report != '':
+                        if Report.objects.filter(report_title = report).exists():
+                            report_inst = Report.objects.get(report_title = report)
+                            report_list2.append(report_inst)
+                        else:
+                            folder.folder_reports = folder.folder_reports.replace(report, '', 1)
+            return render_to_response('witness/user_view_folders.html', {'folderTitle': folderTitle, 'reportList':report_list2, 'invalid_name':True}, context)
+    else:
+        folders = ReportFolder.objects.filter(folder_owner__exact = request.user)
+        return render_to_response('witness/user_folders.html', {'folderList':folders}, context)
+
+
 def addgroup(request):
     context = RequestContext(request)
     if request.method == 'POST':
@@ -125,27 +285,38 @@ def logout(request):
     return render_to_response("witness/logout.html")
 
 def register(request):
-    if request.method == 'POST':    
+    context = RequestContext(request) 
+    if request.method == 'POST': 
         username = request.POST.get('username', '')
         password = request.POST.get('password', '')
+        password2 = request.POST.get('password2', '')
         email = request.POST.get('email', '')
-        user = User.objects.create_user(username=username,email=email, password = password)
-        user = authenticate(username=username, password = password)
-        #user.save()
-        if user is not None and user.is_active:
-            #correct password, user is active
-            #create a reporter with the user and log the user in
-            reporter = Reporter(name = username, user = user)
-            reporter.save()
-            auth.login(request, reporter.user)
-            #direct to success page
-            return HttpResponseRedirect("/userpage")
+        userExists = User.objects.filter(username = username).exists()
+        username_error = userExists
+        if (username_error): #if there already exists a user with that name
+            return render_to_response("witness/register.html", {'username_error': username_error}, context)
+
+        elif(password2 == password):
+            user = User.objects.create_user(username=username,email=email, password = password)
+            user = authenticate(username=username, password = password)
+            #user.save()
+            if user is not None and user.is_active:
+                #correct password, user is active
+                #create a reporter with the user and log the user in
+                reporter = Reporter(name = username, user = user)
+                reporter.save()
+                auth.login(request, reporter.user)
+                #direct to success page
+                return HttpResponseRedirect("/userpage")
+            else:
+                return HttpResponseRedirect("/account/invalid")
+                
         else:
-            #error page
-            return HttpResponseRedirect("/account/invalid")
-            #return render_to_response("witness/login.html", {'hello':"Login here"})
+            password_error = True
+            return render_to_response("witness/register.html", {'password_error': password_error, 'username':username, 'email':email}, context)
     else:
-        return render_to_response("witness/register.html", RequestContext(request, {}))
+        password_error = False
+        return render_to_response("witness/register.html", {'password_error': password_error}, context)
 
 
 def access_error(request):
@@ -191,11 +362,12 @@ def admin_view_report(request):
         reportLong = report.report_long_description
         created = report.report_creation_date
         owner = report.report_owner
+        reportGroup = report.report_group
         public = report.report_public
         document = report.report_file
         encrypt = report.report_file_encryption
         return render_to_response('witness/admin_view_report.html', {'reportTitle': reportTitle,
-        'reportShort': reportShort, 'reportLong':reportLong, 'created':created, 'owner': owner, 'public':public, 'document':document,'encrypt':encrypt}, context)
+        'reportShort': reportShort, 'reportGroup':reportGroup, 'reportLong':reportLong, 'created':created, 'owner': owner, 'public':public, 'document':document,'encrypt':encrypt}, context)
     else:
         reports = Report.objects.all()
         return render_to_response('witness/admin_reports.html', {'reportList':reports}, context)
@@ -262,22 +434,36 @@ def user_edit_report(request):
         form = ReportEditForm(instance = report)
         return render_to_response('witness/user_edit_report.html', {'form':form, 'report_Title':report_Title}, context)
     elif request.method == 'POST':
-        report_Title = request.POST.get("save")
-        report = Report.objects.get(report_title = report_Title)
-        report.report_title = request.POST.get('report_title', '')
-        report.report_short_description = request.POST.get('report_short_description', '')
-        report.report_long_description = request.POST.get('report_long_description', '')
-        report.report_public = request.POST.get('report_public', '')
-        report.report_file_encryption = request.POST.get('report_file_encryption', '')
-        report.report_file = request.POST.get('report_file', '')
-        report.save()
-        return render_to_response('witness/user_edit_report.html', {'response':'Report updated successfully'}, context)
-   
+        group_name = request.POST.get('report_group', '')
+        groupExists = Group.objects.filter(name = group_name).exists()
+        if groupExists or group_name == '':
+            report_Title = request.POST.get("save")
+            report = Report.objects.get(report_title = report_Title)
+            newName = request.POST.get('report_title', '')
+            if not Report.objects.filter(report_title = newName).exists() or newName == report_Title:
+                report.report_title = newName
+                report.report_short_description = request.POST.get('report_short_description', '')
+                report.report_long_description = request.POST.get('report_long_description', '')
+                report.report_public = request.POST.get('report_public', '')
+                report.report_file_encryption = request.POST.get('report_file_encryption', '')
+                report.report_file = request.POST.get('report_file', '')
+                report.report_group = request.POST.get('report_group', '')
+                report.save()
+                return render_to_response('witness/user_edit_report.html', {'response':'Report updated successfully'}, context)
+            else:
+                form = ReportEditForm(instance = report)
+                return render_to_response('witness/user_edit_report.html', {'form':form, 'report_Title':report_Title, 'invalid_name': True}, context)
+        else:
+            report_Title = request.POST.get('save','')
+            report = Report.objects.get(report_title = report_Title)
+            form = ReportEditForm(instance = report)
+            groupInvalid = True
+            return render_to_response('witness/user_edit_report.html', {'form':form, 'report_Title':report_Title, 'groupInvalid': groupInvalid}, context)
 
 class ReportEditForm(ModelForm):
     class Meta:
         model = Report
-        fields = ['report_title', 'report_short_description','report_long_description', 'report_public', 'report_file_encryption', 'report_file']
+        fields = ['report_title', 'report_short_description','report_group', 'report_long_description', 'report_public', 'report_file_encryption', 'report_file']
 
 def msg3(request):
     if request.method == 'GET':

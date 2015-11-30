@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'securewitness.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'mydatabase2',
+        'NAME': 'mydatabase7',
 	    'USER': 'postgres',
 	    'PASSWORD': 'popsicle4',
 	    'HOST': 'localhost',
@@ -113,7 +113,7 @@ STATIC_URL = '/static/'
 import dj_database_url
 DATABASES['default'] =  dj_database_url.config()
 DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql_psycopg2'
-DATABASES['default']['NAME'] = 'mydatabase2'
+DATABASES['default']['NAME'] = 'mydatabase7'
 DATABASES['default']['USER'] = 'postgres'
 DATABASES['default']['PASSWORD'] = 'popsicle4'
 

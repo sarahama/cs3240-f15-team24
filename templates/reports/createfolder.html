@@ -1,13 +1,9 @@
 {% extends 'Reports/base.html' %}
 
 {% block content %}
- 
-    <h1> Create Report </h1>
-    {% if groupInvalid %}
-        <p>That group does not exist</p>
-    {% endif %}
+    <h1> Create Folder </h1>
     {% if invalid_name %}
-        <p>A report already exists with that name</p>
+        <p>A folder already exists with that name</p>
     {% endif %}
     <form method = "POST" class = "post-form" enctype="multipart/form-data">
         {% csrf_token %}

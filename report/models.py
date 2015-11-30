@@ -10,6 +10,7 @@ class ReportFolder(models.Model):
     folder_title = models.CharField(max_length=200)
     folder_creation_date = models.DateTimeField('date published')
     folder_owner = models.ForeignKey('auth.User')
+    folder_reports = models.CharField(default = '', max_length=1000)
     def __str__(self):
         return self.folder_title
 
@@ -21,6 +22,7 @@ class Report(models.Model):
     report_owner = models.ForeignKey('auth.User')
     report_public = models.BooleanField(default = False)
     report_file = models.FileField(upload_to = 'media')
+    report_group = models.CharField(default = '', max_length = 200)
     report_file_encryption = models.BooleanField(default = False)
 
     #report_folder = models.ForeignKey(ReportFolder)

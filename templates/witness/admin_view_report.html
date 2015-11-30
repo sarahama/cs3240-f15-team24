@@ -6,10 +6,24 @@
     <li><a href="/adminhome">Admin home</a></li>
     {% endif %}
     <p>Title: {{reportTitle}}</p>
+    {% if reportGroup != '' %}
+    <p>The group {{reportGroup}} has access to this report </p>
+    {% endif %}
     <p>Short description: {{reportShort}}</p>
     <p>Long description: {{reportLong}}</p>
     <p>Created: {{created}}</p>
     <p>Public: {{public}}</p>
     <p>File: {{document}} </p>
     <p>Encrypted?: {{encrypt}} </p>
+    {% if request.user == owner %}
+        <form action="{%  url 'editreport' %}" method="GET">{% csrf_token %}
+        <button type = "submit" value = "{{reportTitle}}" name = "edit">Edit</button></li></form>
+    {% endif %}
+    
+    {% if request.user == owner or request.user.is_superuser %}
+        <form action = "{% url 'deletedreport' %}" method = "POST">{% csrf_token %}
+        <button type = 'submit' name = 'delete' value = "{{reportTitle}}">Delete report</button></p>
+        </form> 
+    {% endif %}
+
 </html>

@@ -1,33 +1,6 @@
-{% extends "admin/base_site.html" %}
-{% load i18n admin_static %}
-
-{% block extrastyle %}<link rel="stylesheet" type="text/css" href="{% static "admin/css/login.css" %}" />{% endblock %}
-
-{% block bodyclass %}{{ block.super }} login{% endblock %}
-
-{% block usertools %}{% endblock %}
-
-{% block nav-global %}{% endblock %}
-
-{% block content_title %}'Login'{% endblock %}
-
-{% block breadcrumbs %}{% endblock %}
-
-{% block content %}
-{% if form.errors and not form.non_field_errors %}
-<p class="errornote">
-{% if form.errors.items|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
-</p>
-{% endif %}
-
-{% if form.non_field_errors %}
-{% for error in form.non_field_errors %}
-<p class="errornote">
-    {{ error }}
-</p>
-{% endfor %}
-{% endif %}
-
+<!DOCTYPE html>
+<html>
+<h1>SecureShare Login</h1>
 <div id="content-main">
 <form action="/login/" method="POST" id="login-form">{% csrf_token %}
   <div>
@@ -40,9 +13,9 @@
   <input type="hidden" name="next" value="{{next}}">
   </div>
   <div class="submit-row">
-    <label>&nbsp;</label><input type="submit" value="{% trans 'Log in' %}" />
+    <label>&nbsp;</label><input type="submit" value="Log in" />
   </div>
-    <li><a href="/register">Register</a></li>
+    <p>Not a user? Register <a href="/register">here</a></li> </p>
   <div>
   </div>
 </form>
@@ -51,4 +24,4 @@
 document.getElementById('id_username').focus()
 </script>
 </div>
-{% endblock %}
+</html>

@@ -1,10 +1,19 @@
 <html>
-        <h1> Edit {{report_Title}} </h1>
+    <h1> Edit {{report_Title}} </h1>
     <ul><a href="/logout">Logout</a></ul>
     <ul><a href="/userpage">Home</a></ul>
+    {% if groupInvalid %}
+        <p>That group does not exist</p>
+    {% endif %}
+    {% if invalid_name %}
+        <p>A report with that name already exists</p>
+    {% endif %}
     <form action="{%  url 'editreport' %}" method="POST">{% csrf_token %}
         <p>{{form}}</p>
-        <button type="submit" value= '{{report_Title}}' name = "save">Save</button>
+        {% if response != 'Report updated successfully' %}
+        <button type="submit" value= '{{report_Title}}' name = "save">Save changes</button>
+        {% endif %}
     </form>
+    
         <p>{{response}}</p>
 </html>
