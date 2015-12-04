@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-    <h1>Folder: {{folderTitle}}</h1>
+    <h1>Folder: {{folder.folder_title}}</h1>
     <li><a href="/logout">Logout</a></li>
     {% if request.user.is_superuser %}
     <li><a href="/adminhome">Admin home</a></li>
@@ -8,8 +8,8 @@
     <ul><a href="/userpage">Home</a></ul>
     <form action = "{% url 'userviewfolders' %}" method = "POST">{% csrf_token %}
     <label for="Title">Folder Title: </label>
-    <p><input id = "Title" type = "text" name = 'renamefolder' value="{{folderTitle}}">
-    <button type = 'submit' name = 'rename' value = "{{folderTitle}}">Rename folder</button></p>
+    <p><input id = "Title" type = "text" name = 'renamefolder' value="{{folder.folder_title}}">
+    <button type = 'submit' name = 'rename' value = "{{folder.folder_title}}">Rename folder</button></p>
     </form>
     {% if invalid_report %}
     <p>You do not own the report {{report_name}}</p>
@@ -21,7 +21,7 @@
         {% for report in reportList %}
         <li>{{report.report_title}} 
         <form action="{%  url 'userviewreport' %}" method="GET">{% csrf_token %}
-                <button type = "submit" value = "{{report.report_title}}" name = "view">View</button> </form>
+                <button type = "submit" value = "{{report.pk}}" name = "view">View</button> </form>
         </li>
         {% endfor %}
     </ul>
@@ -29,11 +29,11 @@
     <form action = "{% url 'userviewfolders' %}" method = "POST">{% csrf_token %}
     	<p>Only reports you own can be added to your folders</p>
     	<p><input id = "addreport" type = "text" name = 'addreport' value="{{current_name}}">
-        <button type = 'submit' name = 'edit2' value = "{{folderTitle}}">Add Report</button></p>
+        <button type = 'submit' name = 'edit2' value = "{{folder.pk}}">Add Report</button></p>
         <p><input id = "removereport" type = "text" name = 'removereport' value="{{current_name}}">
-        <button type = 'submit' name = 'edit2' value = "{{folderTitle}}">Remove Report</button></p>
+        <button type = 'submit' name = 'edit2' value = "{{folder.pk}}">Remove Report</button></p>
     </form>
     <form action = "{% url 'userfolders' %}" method = "POST">{% csrf_token %}
-        <button type = 'submit' name = 'delete' value = "{{folderTitle}}">Delete this folder</button></p>
+        <button type = 'submit' name = 'delete' value = "{{folder.pk}}">Delete this folder</button></p>
     </form>	
 </html>

@@ -16,7 +16,7 @@
             {% for report in reportList %}
             <li>{{report.report_title}} 
             <form action="{%  url 'userviewreport' %}" method="GET">{% csrf_token %}
-                <button type = "submit" value = "{{report.report_title}}" name = "view">View</button> </form>
+                <button type = "submit" value = "{{report.pk}}" name = "view">View</button> </form>
             {% endfor %}
         </ul>
 </html>

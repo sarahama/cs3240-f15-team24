@@ -1,0 +1,18 @@
+{% extends 'Reports/base.html' %}
+
+{% block content %}
+ 
+    <h1> Add Files to {report.report_title} </h1>
+        {% for file in files_in_form %}
+            <ul>{{file.document_name}}</ul>
+        {% endfor %}
+
+        <form action="{%  url 'addfiles' %}" method="POST" enctype = "multipart/form-data">{% csrf_token %}
+            {{form.as_p}}
+            <button type = "submit" value = "{{report.pk}}" name = "add">Add file</button>
+        </form>        
+        <form action="{%  url 'userpage' %}" method="POST" >{% csrf_token %}
+            <button type = "submit" >Finish</button>
+        </form>  
+
+{% endblock %}

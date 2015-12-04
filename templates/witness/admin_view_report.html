@@ -3,7 +3,7 @@
     <h1>{{reportTitle}}</h1>
     <li><a href="/logout">Logout</a></li>
     {% if request.user.is_superuser %}
-    <li><a href="/adminhome">Admin home</a></li>
+    <li><a href="/adminhome">Site Manager home</a></li>
     {% endif %}
     <p>Title: {{reportTitle}}</p>
     {% if reportGroup != '' %}
@@ -17,12 +17,12 @@
     <p>Encrypted?: {{encrypt}} </p>
     {% if request.user == owner %}
         <form action="{%  url 'editreport' %}" method="GET">{% csrf_token %}
-        <button type = "submit" value = "{{reportTitle}}" name = "edit">Edit</button></li></form>
+        <button type = "submit" value = "{{report_pk}}" name = "edit">Edit</button></li></form>
     {% endif %}
     
     {% if request.user == owner or request.user.is_superuser %}
         <form action = "{% url 'deletedreport' %}" method = "POST">{% csrf_token %}
-        <button type = 'submit' name = 'delete' value = "{{reportTitle}}">Delete report</button></p>
+        <button type = 'submit' name = 'delete' value = "{{report_pk}}">Delete report</button></p>
         </form> 
     {% endif %}
 
