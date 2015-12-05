@@ -14,7 +14,9 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.db import models
 from .models import Report
+from .models import File
 from .forms import ReportForm
+from .forms import FileForm
 from .models import ReportFolder
 from .forms import ReportFolderForm
 from django.contrib.auth.models import Group
@@ -39,13 +41,13 @@ def createReport(request):
         report_owner = request.user
         report_group = request.POST.get('report_group', '')
         report_public = request.POST.get('report_public', '')
-        report_file = request.FILES['report_file']
+        #report_file = request.FILES['report_file']
         report_file_encryption = request.POST.get('report_file_encryption', '')
         #report_file = request.POST.get('report_file', '')
         #create the report
         newreport = Report(report_title = report_title, report_short_description = report_short_description, 
                 report_long_description = report_long_description, report_creation_date = timezone.now(),
-                report_owner = report_owner, report_group = report_group, report_public = report_public, report_file = report_file, report_file_encryption = report_file_encryption)
+                report_owner = report_owner, report_group = report_group, report_public = report_public, report_files = '', report_file_encryption = report_file_encryption)
         newreport.save()
         return HttpResponseRedirect("/userpage")
     else:
@@ -82,4 +84,49 @@ def createFolder(request):
         #display the create folder page using the create report form
         form = ReportFolderForm()
         return render(request, 'reports/createfolder.html', {'form':form})
+
+def addFiles(request):
+    context = RequestContext(request)
+    if request.method == "GET":
+        report_pk = request.GET.get('addfiles', '')
+        report = Report.objects.get(pk = report_pk)
+        form = FileForm()
+
+        files = report.report_files.split(',')
+        file_list = []
+        for f in files:
+            if f != '':
+                if File.objects.filter(pk__exact = int(f)).exists():
+                    f2 = File.objects.get(pk = int(f))
+                    file_list.append(f2)
+        return render_to_response('reports/addfiles.html', {'report': report, 'form':form, 'file_list':file_list}, context)
+    if request.method == "POST":
+        if request.POST.get('remove','') != '':
+            report_pk = request.POST.get('remove', '')
+            file_pks = request.POST.getlist('file')
+            report = Report.objects.get(pk = report_pk)
+            for f in file_pks:
+                report.report_files = report.report_files.replace(str(f), '',1)
+                report.save()
+
+        elif request.POST.get('add',''):
+            report_file = request.FILES['document']
+            newFile = File(document = report_file)
+            newFile.save()
+            file_pk = newFile.pk
+            report_pk = request.POST.get('add', '')
+            report = Report.objects.get(pk = report_pk)
+
+            report.report_files = report.report_files + str(file_pk) + ','
+            report.save()
+
+        files = report.report_files.split(',')
+        file_list = []
+        for f in files:
+            if f != '':
+                if File.objects.filter(pk__exact = int(f)).exists():
+                    f2 = File.objects.get(pk = int(f))
+                    file_list.append(f2)
+        form = FileForm()
+        return render_to_response('reports/addfiles.html', {'report': report, 'form':form, 'file_list':file_list}, context)
 

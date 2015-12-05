@@ -20,6 +20,7 @@ from django.forms import ModelForm
 from django.forms import formset_factory
 from django.db import models
 from report.models import Report
+from report.models import File
 from django.views.generic.edit import UpdateView
 from django.forms import ModelForm
 from .ecryption import encrypt
@@ -101,19 +102,14 @@ def user_view_report(request):
         #reportTitle = request.GET.get("view", '')
         report_pk = request.GET.get("view",'')
         report = Report.objects.get(pk = report_pk)
-        #report = Report.objects.get(report_title = reportTitle)
-        reportTitle = report.report_title
-        reportShort = report.report_short_description
-        reportLong = report.report_long_description
-        reportGroup = report.report_group
-        created = report.report_creation_date
-        owner = report.report_owner
-        public = report.report_public
-        document = report.report_file
-        encrypt = report.report_file_encryption
-        #return render_to_response('witness/admin_view_report.html', {'report':report}, context)
-        return render_to_response('witness/admin_view_report.html', {'reportTitle': reportTitle, 'report_pk':report_pk,
-        'reportShort': reportShort, 'reportGroup':reportGroup, 'reportLong':reportLong, 'created':created, 'owner': owner, 'public':public, 'document':document, 'encrypt':encrypt}, context)
+        files = report.report_files.split(',')
+        file_list = []
+        for f in files:
+            if f != '':
+                if File.objects.filter(pk__exact = int(f)).exists():
+                    f2 = File.objects.get(pk = int(f))
+                    file_list.append(f2)
+        return render_to_response('witness/admin_view_report.html', {'report': report, 'file_list':file_list}, context)
     else:
         reports = Report.objects.filter(report_owner__exact = request.user)
         return render_to_response('witness/user_reports.html', {'reportList':reports}, context)
@@ -360,18 +356,14 @@ def admin_view_report(request):
     if request.method == 'GET':
         report_pk = request.GET.get("view", '')
         report = Report.objects.get(pk = report_pk)
-        reportTitle = report.report_title
-        reportShort = report.report_short_description
-        reportLong = report.report_long_description
-        created = report.report_creation_date
-        owner = report.report_owner
-        reportGroup = report.report_group
-        public = report.report_public
-        document = report.report_file
-        encrypt = report.report_file_encryption
-        report_pk = report.pk
-        return render_to_response('witness/admin_view_report.html', {'reportTitle': reportTitle, 'report_pk':report_pk,
-        'reportShort': reportShort, 'reportGroup':reportGroup, 'reportLong':reportLong, 'created':created, 'owner': owner, 'public':public, 'document':document,'encrypt':encrypt}, context)
+        files = report.report_files.split(',')
+        file_list = []
+        for f in files:
+            if f != '':
+                if File.objects.filter(pk__exact = int(f)).exists():
+                    f2 = File.objects.get(pk = int(f))
+                    file_list.append(f2)
+        return render_to_response('witness/admin_view_report.html', {'report': report, 'file_list':file_list}, context)
     else:
         reports = Report.objects.all()
         return render_to_response('witness/admin_reports.html', {'reportList':reports}, context)
@@ -436,34 +428,34 @@ def user_edit_report(request):
         report_pk = request.GET.get('edit','')
         report = Report.objects.get(pk = report_pk)
         form = ReportEditForm(instance = report)
-        return render_to_response('witness/user_edit_report.html', {'form':form, 'report_Title':report_Title}, context)
+        return render_to_response('witness/user_edit_report.html', {'form':form, 'report':report}, context)
     elif request.method == 'POST':
         group_name = request.POST.get('report_group', '')
         groupExists = Group.objects.filter(name = group_name).exists()
         if groupExists or group_name == '':
-            report_Title = request.POST.get("save")
-            report = Report.objects.get(report_title = report_Title)
+            report_pk = request.POST.get("save")
+            report = Report.objects.get(pk = report_pk)
             newName = request.POST.get('report_title', '')
             report.report_title = newName
             report.report_short_description = request.POST.get('report_short_description', '')
             report.report_long_description = request.POST.get('report_long_description', '')
             report.report_public = request.POST.get('report_public', '')
             report.report_file_encryption = request.POST.get('report_file_encryption', '')
-            report.report_file = request.POST.get('report_file', '')
+            #report.report_file = request.POST.get('report_file', '')
             report.report_group = request.POST.get('report_group', '')
             report.save()
             return render_to_response('witness/user_edit_report.html', {'response':'Report updated successfully'}, context)
         else:
-            report_Title = request.POST.get('save','')
-            report = Report.objects.get(report_title = report_Title)
+            report_pk = request.POST.get('save','')
+            report = Report.objects.get(pk = report_pk)
             form = ReportEditForm(instance = report)
             groupInvalid = True
-            return render_to_response('witness/user_edit_report.html', {'form':form, 'report_Title':report_Title, 'groupInvalid': groupInvalid}, context)
+            return render_to_response('witness/user_edit_report.html', {'form':form, 'report':report, 'groupInvalid': groupInvalid}, context)
 
 class ReportEditForm(ModelForm):
     class Meta:
         model = Report
-        fields = ['report_title', 'report_short_description','report_group', 'report_long_description', 'report_public', 'report_file_encryption', 'report_file']
+        fields = ['report_title', 'report_short_description','report_group', 'report_long_description', 'report_public', 'report_file_encryption']
 
 def msg3(request):
     if request.method == 'GET':

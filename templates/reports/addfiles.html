@@ -2,17 +2,20 @@
 
 {% block content %}
  
-    <h1> Add Files to {report.report_title} </h1>
-        {% for file in files_in_form %}
-            <ul>{{file.document_name}}</ul>
-        {% endfor %}
-
-        <form action="{%  url 'addfiles' %}" method="POST" enctype = "multipart/form-data">{% csrf_token %}
-            {{form.as_p}}
-            <button type = "submit" value = "{{report.pk}}" name = "add">Add file</button>
-        </form>        
-        <form action="{%  url 'userpage' %}" method="POST" >{% csrf_token %}
-            <button type = "submit" >Finish</button>
-        </form>  
+    <h1> Add Files to {{report.report_title}}</h1>
+    <form action="{%  url 'addfiles' %}" method="POST">{% csrf_token %}
+    {%for file in file_list%}
+        <p><input type="checkbox" name="file" value = "{{file.pk}}"/>{{file.document}}</p>
+    {%endfor%}
+        <button type = "submit" name = "remove" value = "{{report.pk}}">Remove selected files</button>
+    </form>   
+    <form action= "{% url 'addfiles'%}" method = "POST" class = "post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+       <button type = "submit" name = "add" value = "{{report.pk}}" class "save btn btn-default"> Add </button>
+    </form>
+    <form action="{%  url 'userpage' %}" method="POST" >{% csrf_token %}
+            <button type = "submit" >Save</button>
+    </form>  
 
 {% endblock %}

@@ -1,28 +1,33 @@
 <!DOCTYPE html>
 <html>
-    <h1>{{reportTitle}}</h1>
+    <h1>{{report.report_title}}</h1>
     <li><a href="/logout">Logout</a></li>
     {% if request.user.is_superuser %}
     <li><a href="/adminhome">Site Manager home</a></li>
     {% endif %}
-    <p>Title: {{reportTitle}}</p>
-    {% if reportGroup != '' %}
-    <p>The group {{reportGroup}} has access to this report </p>
+    <p>Title: {{report.report_title}}</p>
+    {% if report.report_group != '' %}
+    <p>The group {{report.report_group}} has access to this report </p>
     {% endif %}
-    <p>Short description: {{reportShort}}</p>
-    <p>Long description: {{reportLong}}</p>
-    <p>Created: {{created}}</p>
-    <p>Public: {{public}}</p>
-    <p>File: {{document}} </p>
-    <p>Encrypted?: {{encrypt}} </p>
-    {% if request.user == owner %}
+    <p>Short description: {{report.report_short_description}}</p>
+    <p>Long description: {{report.report_long_description}}</p>
+    <p>Files: </p>
+    {%for file in file_list%}
+        <ul>{{file.document}}</ul>
+    {% endfor %}
+    <p>Created: {{report.report_creation_date}}</p>
+    <p>Public: {{report.report_public}}</p>
+    <p>Encrypted?: {{report.report_file_encryption}} </p>
+    {% if request.user == report.report_owner %}
         <form action="{%  url 'editreport' %}" method="GET">{% csrf_token %}
-        <button type = "submit" value = "{{report_pk}}" name = "edit">Edit</button></li></form>
+        <button type = "submit" value = "{{report.pk}}" name = "edit">Edit</button></li></form>
+        <form action="{%  url 'addfiles' %}" method="GET">{% csrf_token %}
+        <button type = "submit" value = "{{report.pk}}" name = "addfiles">Add files</button></li></form>
     {% endif %}
     
-    {% if request.user == owner or request.user.is_superuser %}
+    {% if request.user == report.report_owner or request.user.is_superuser %}
         <form action = "{% url 'deletedreport' %}" method = "POST">{% csrf_token %}
-        <button type = 'submit' name = 'delete' value = "{{report_pk}}">Delete report</button></p>
+        <button type = 'submit' name = 'delete' value = "{{report.pk}}">Delete report</button></p>
         </form> 
     {% endif %}
 
