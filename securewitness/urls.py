@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^editreport/', 'witness.views.user_edit_report', name = 'editreport'),
     url(r'^accesserror/', 'witness.views.access_error', name = 'errorpage'),
     url(r'^createreport/', 'report.views.createReport', name='createreport'),
+    url(r'^addfiles/', 'report.views.addFiles', name='addfiles'),
     url(r'^creategroup/', 'witness.views.creategroup', name = 'creategroup'),
     url(r'^createfolder/', 'report.views.createFolder', name = 'createfolder'),
     url(r'^addgroup/', 'witness.views.addgroup', name = 'addgroup'),

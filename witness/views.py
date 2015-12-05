@@ -20,6 +20,7 @@ from django.forms import ModelForm
 from django.forms import formset_factory
 from django.db import models
 from report.models import Report
+from report.models import File
 from django.views.generic.edit import UpdateView
 from django.forms import ModelForm
 from .ecryption import encrypt
@@ -98,41 +99,36 @@ def user_reports(request):
 def user_view_report(request):
     context = RequestContext(request)
     if request.method == 'GET':
-        reportTitle = request.GET.get("view", '')
-        report = Report.objects.get(report_title = reportTitle)
-        reportTitle = report.report_title
-        reportShort = report.report_short_description
-        reportLong = report.report_long_description
-        reportGroup = report.report_group
-        created = report.report_creation_date
-        owner = report.report_owner
-        public = report.report_public
-        document = report.report_file
-        encrypt = report.report_file_encryption
-        return render_to_response('witness/admin_view_report.html', {'reportTitle': reportTitle,
-        'reportShort': reportShort, 'reportGroup':reportGroup, 'reportLong':reportLong, 'created':created, 'owner': owner, 'public':public, 'document':document, 'encrypt':encrypt}, context)
+        #reportTitle = request.GET.get("view", '')
+        report_pk = request.GET.get("view",'')
+        report = Report.objects.get(pk = report_pk)
+        files = report.report_files.split(',')
+        file_list = []
+        for f in files:
+            if f != '':
+                if File.objects.filter(pk__exact = int(f)).exists():
+                    f2 = File.objects.get(pk = int(f))
+                    file_list.append(f2)
+        return render_to_response('witness/admin_view_report.html', {'report': report, 'file_list':file_list}, context)
     else:
         reports = Report.objects.filter(report_owner__exact = request.user)
         return render_to_response('witness/user_reports.html', {'reportList':reports}, context)
 
 def deleted_report(request):
     context = RequestContext(request)
-    if request.method == 'POST' and not request.user.is_superuser:
-        reportTitle = request.POST.get('delete', '')
-        report = Report.objects.get(report_owner__exact = request.user, report_title__exact = reportTitle)
+    if request.method == 'POST':
+        report_pk = request.POST.get('delete', '')
+        report = Report.objects.get(pk = report_pk)
+        reportTitle = report.report_title
         report.delete()
         return render_to_response('reports/deleted_report.html', {'reportTitle':reportTitle}, context)
-    elif request.method == 'POST' and request.user.is_superuser:
-        reportTitle = request.POST.get('delete', '')
-        report = Report.objects.get(report_title__exact = reportTitle)
-        report.delete()
-        return render_to_response('reports/deleted_report.html', {'reportTitle':reportTitle}, context)
+
 
 def user_folders(request):
     context = RequestContext(request)
     if request.method == 'POST' and request.POST.get('delete', '') != '':
         deletefolder = request.POST.get('delete', '')
-        folder = ReportFolder.objects.get(folder_title__exact = deletefolder, folder_owner__exact = request.user)
+        folder = ReportFolder.objects.get(pk = deletefolder)
         folder.delete()
         folders = ReportFolder.objects.filter(folder_owner__exact = request.user)
         return render_to_response('witness/user_folders.html', {'folderList':folders}, context)
@@ -148,8 +144,8 @@ def user_view_folders(request):
     context = RequestContext(request)
     invalid_report = False
     if request.method == 'GET':
-        folderTitle = request.GET.get("view", '')
-        folder = ReportFolder.objects.get(folder_title = folderTitle, folder_owner__exact = request.user)
+        folder_pk = request.GET.get("view", '')
+        folder = ReportFolder.objects.get(pk = folder_pk)
         folderTitle = folder.folder_title
         reports = folder.folder_reports
         report_list2 = []
@@ -157,40 +153,43 @@ def user_view_folders(request):
             report_list = reports.split(',')
             for report in report_list:
                 if report != '':
-                    if Report.objects.filter(report_title = report).exists():
-                        report_inst = Report.objects.get(report_title = report)
+                    if Report.objects.filter(pk__exact = report).exists():
+                        report_inst = Report.objects.get(pk = report)
                         report_list2.append(report_inst)
                     else:
                         folder.folder_reports = folder.folder_reports.replace(report, '', 1)
-        return render_to_response('witness/user_view_folders.html', {'folderTitle': folderTitle, 'reportList':report_list2}, context)
+        return render_to_response('witness/user_view_folders.html', {'folder': folder, 'reportList':report_list2}, context)
     elif request.method == 'POST' and request.POST.get('edit2', '') != '':
         addreport = request.POST.get('addreport','')
-        folderTitle = request.POST.get('edit2', '')
+        folder_pk = request.POST.get('edit2', '')
         remove = request.POST.get('removereport','')
-        folder = ReportFolder.objects.get(folder_title = folderTitle, folder_owner__exact = request.user)
+        folder = ReportFolder.objects.get(pk = folder_pk)
         report_list = folder.folder_reports.split(',')
-        if addreport not in report_list:
-            if Report.objects.filter(report_owner__exact = request.user).filter(report_title__exact = addreport).exists():
-                folder.folder_reports = folder.folder_reports + ',' + addreport
-                folder.save()
-            elif addreport != '':    
-                invalid_report = True
-        if remove in report_list:
-            remove = remove
-            folder.folder_reports = folder.folder_reports.replace(remove, '', 1)
+        if Report.objects.filter(report_owner__exact = request.user).filter(report_title__exact = addreport).exists():
+            report = Report.objects.get(report_owner__exact = request.user, report_title__exact = addreport)
+            report_pk = report.pk
+            folder.folder_reports = folder.folder_reports + ',' + (str)(report_pk)
             folder.save()
+        elif addreport != '':    
+            invalid_report = True
+        if Report.objects.filter(report_owner__exact = request.user).filter(report_title__exact = remove).exists():
+            report = Report.objects.get(report_owner__exact = request.user, report_title__exact = remove)
+            report_pk = str(report.pk)
+            if report_pk in report_list:
+                folder.folder_reports = folder.folder_reports.replace(report_pk, '', 1)
+                folder.save()
         report_list2 = []
         reports = folder.folder_reports
         if reports != '':
             report_list = reports.split(',')
             for report in report_list:
                 if report != '':
-                    if Report.objects.filter(report_title = report).exists():
-                        report_inst = Report.objects.get(report_title = report)
+                    if Report.objects.filter(pk = int(report)).exists():
+                        report_inst = Report.objects.get(pk = int(report))
                         report_list2.append(report_inst)
                     else:
                         folder.folder_reports = folder.folder_reports.replace(report, '', 1)
-        return render_to_response('witness/user_view_folders.html', {'folderTitle': folderTitle, 'reportList':report_list2, 'invalid_report':invalid_report, 'report_name':addreport}, context)
+        return render_to_response('witness/user_view_folders.html', {'folder': folder, 'reportList':report_list2, 'invalid_report':invalid_report, 'report_name':addreport}, context)
     elif request.method == 'POST' and request.POST.get('rename','') != '':
         folderTitle = request.POST.get('rename', '')
         folder = ReportFolder.objects.get(folder_title = folderTitle, folder_owner__exact = request.user)
@@ -206,13 +205,13 @@ def user_view_folders(request):
                 report_list = reports.split(',')
                 for report in report_list:
                     if report != '':
-                        if Report.objects.filter(report_title = report).exists():
-                            report_inst = Report.objects.get(report_title = report)
+                        if Report.objects.filter(pk = int(report)).exists():
+                            report_inst = Report.objects.get(pk = int(report))
                             report_list2.append(report_inst)
                         else:
                             folder.folder_reports = folder.folder_reports.replace(report, '', 1)
 
-            return render_to_response('witness/user_view_folders.html', {'folderTitle': folderTitle, 'reportList':report_list2}, context)
+            return render_to_response('witness/user_view_folders.html', {'folder': folder, 'reportList':report_list2}, context)
         else:
             reports = folder.folder_reports
             report_list2 = []
@@ -220,12 +219,12 @@ def user_view_folders(request):
                 report_list = reports.split(',')
                 for report in report_list:
                     if report != '':
-                        if Report.objects.filter(report_title = report).exists():
-                            report_inst = Report.objects.get(report_title = report)
+                        if Report.objects.filter(pk = int(report)).exists():
+                            report_inst = Report.objects.get(pk = int(report))
                             report_list2.append(report_inst)
                         else:
                             folder.folder_reports = folder.folder_reports.replace(report, '', 1)
-            return render_to_response('witness/user_view_folders.html', {'folderTitle': folderTitle, 'reportList':report_list2, 'invalid_name':True}, context)
+            return render_to_response('witness/user_view_folders.html', {'folder': folder, 'reportList':report_list2, 'invalid_name':True}, context)
     else:
         folders = ReportFolder.objects.filter(folder_owner__exact = request.user)
         return render_to_response('witness/user_folders.html', {'folderList':folders}, context)
@@ -355,19 +354,16 @@ def admin_reports(request):
 def admin_view_report(request):
     context = RequestContext(request)
     if request.method == 'GET':
-        reportTitle = request.GET.get("view", '')
-        report = Report.objects.get(report_title = reportTitle)
-        reportTitle = report.report_title
-        reportShort = report.report_short_description
-        reportLong = report.report_long_description
-        created = report.report_creation_date
-        owner = report.report_owner
-        reportGroup = report.report_group
-        public = report.report_public
-        document = report.report_file
-        encrypt = report.report_file_encryption
-        return render_to_response('witness/admin_view_report.html', {'reportTitle': reportTitle,
-        'reportShort': reportShort, 'reportGroup':reportGroup, 'reportLong':reportLong, 'created':created, 'owner': owner, 'public':public, 'document':document,'encrypt':encrypt}, context)
+        report_pk = request.GET.get("view", '')
+        report = Report.objects.get(pk = report_pk)
+        files = report.report_files.split(',')
+        file_list = []
+        for f in files:
+            if f != '':
+                if File.objects.filter(pk__exact = int(f)).exists():
+                    f2 = File.objects.get(pk = int(f))
+                    file_list.append(f2)
+        return render_to_response('witness/admin_view_report.html', {'report': report, 'file_list':file_list}, context)
     else:
         reports = Report.objects.all()
         return render_to_response('witness/admin_reports.html', {'reportList':reports}, context)
@@ -429,41 +425,37 @@ def get_Message(request):
 def user_edit_report(request):
     context = RequestContext(request)
     if request.method == 'GET':
-        report_Title = request.GET.get('edit','')
-        report = Report.objects.get(report_title = report_Title)
+        report_pk = request.GET.get('edit','')
+        report = Report.objects.get(pk = report_pk)
         form = ReportEditForm(instance = report)
-        return render_to_response('witness/user_edit_report.html', {'form':form, 'report_Title':report_Title}, context)
+        return render_to_response('witness/user_edit_report.html', {'form':form, 'report':report}, context)
     elif request.method == 'POST':
         group_name = request.POST.get('report_group', '')
         groupExists = Group.objects.filter(name = group_name).exists()
         if groupExists or group_name == '':
-            report_Title = request.POST.get("save")
-            report = Report.objects.get(report_title = report_Title)
+            report_pk = request.POST.get("save")
+            report = Report.objects.get(pk = report_pk)
             newName = request.POST.get('report_title', '')
-            if not Report.objects.filter(report_title = newName).exists() or newName == report_Title:
-                report.report_title = newName
-                report.report_short_description = request.POST.get('report_short_description', '')
-                report.report_long_description = request.POST.get('report_long_description', '')
-                report.report_public = request.POST.get('report_public', '')
-                report.report_file_encryption = request.POST.get('report_file_encryption', '')
-                report.report_file = request.POST.get('report_file', '')
-                report.report_group = request.POST.get('report_group', '')
-                report.save()
-                return render_to_response('witness/user_edit_report.html', {'response':'Report updated successfully'}, context)
-            else:
-                form = ReportEditForm(instance = report)
-                return render_to_response('witness/user_edit_report.html', {'form':form, 'report_Title':report_Title, 'invalid_name': True}, context)
+            report.report_title = newName
+            report.report_short_description = request.POST.get('report_short_description', '')
+            report.report_long_description = request.POST.get('report_long_description', '')
+            report.report_public = request.POST.get('report_public', '')
+            report.report_file_encryption = request.POST.get('report_file_encryption', '')
+            #report.report_file = request.POST.get('report_file', '')
+            report.report_group = request.POST.get('report_group', '')
+            report.save()
+            return render_to_response('witness/user_edit_report.html', {'response':'Report updated successfully'}, context)
         else:
-            report_Title = request.POST.get('save','')
-            report = Report.objects.get(report_title = report_Title)
+            report_pk = request.POST.get('save','')
+            report = Report.objects.get(pk = report_pk)
             form = ReportEditForm(instance = report)
             groupInvalid = True
-            return render_to_response('witness/user_edit_report.html', {'form':form, 'report_Title':report_Title, 'groupInvalid': groupInvalid}, context)
+            return render_to_response('witness/user_edit_report.html', {'form':form, 'report':report, 'groupInvalid': groupInvalid}, context)
 
 class ReportEditForm(ModelForm):
     class Meta:
         model = Report
-        fields = ['report_title', 'report_short_description','report_group', 'report_long_description', 'report_public', 'report_file_encryption', 'report_file']
+        fields = ['report_title', 'report_short_description','report_group', 'report_long_description', 'report_public', 'report_file_encryption']
 
 def msg3(request):
     if request.method == 'GET':

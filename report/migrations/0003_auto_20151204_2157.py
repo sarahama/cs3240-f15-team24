@@ -7,17 +7,17 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('report', '0002_auto_20151128_1727'),
+        ('report', '0002_auto_20151204_2118'),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='reportfolder',
-            name='folder_group',
+            model_name='report',
+            name='report_file',
         ),
         migrations.AddField(
             model_name='report',
-            name='report_group',
-            field=models.CharField(default='', max_length=200),
+            name='report_files',
+            field=models.CharField(default='', max_length=500),
         ),
     ]

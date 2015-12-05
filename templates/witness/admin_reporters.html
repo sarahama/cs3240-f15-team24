@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
     <h1>Manage Reporters</h1>
-    <li><a href="/logout">Logout</a></li>
+    <ul><a href="/adminhome">Site Manager Home</a></ul>
+    <ul><a href="/logout">Logout</a></ul>
     <form action="{%  url 'adminuser' %}" method="POST">{% csrf_token %}
         <p><input id = "search" type = "text" name = 'search' value="{{current_name}}">    
         <button type = 'submit'>Search</button></p>
