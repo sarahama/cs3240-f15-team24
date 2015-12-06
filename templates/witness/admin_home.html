@@ -6,9 +6,8 @@
         <a href="/userpage">Home</a>
         <a href="/logout">Logout</a>
        <h2>Manage </h2>
-        <ul>
-        <li><a href="{% url 'adminuser' %}">Reporters</a></li>
-        <li><a href="{% url 'adminreports' %}">Reports</a></li>
-        </ul>
+        <ul><a href="{% url 'adminuser' %}">Reporters</a></ul>
+        <ul><a href="{% url 'adminreports' %}">Reports</a></ul>
+        <ul><a href="{% url 'grouphome' %}">Add Members to Groups</a></ul>
     </body>
 </html>

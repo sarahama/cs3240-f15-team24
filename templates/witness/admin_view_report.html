@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
     <h1>{{report.report_title}}</h1>
+    {% if request.user.is_superuser %}
+    <a href="/adminhome">Site Manager</a>
+    {% endif %}
     <a href="/userpage">Home</a>
     <a href="/logout">Logout</a>
-    {% if request.user.is_superuser %}
-    <li><a href="/adminhome">Site Manager home</a></li>
-    {% endif %}
+    
     <p>Title: {{report.report_title}}</p>
     {% if report.report_group != '' %}
     <p>The group {{report.report_group}} has access to this report </p>

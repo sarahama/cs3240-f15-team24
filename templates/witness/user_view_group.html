@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <h1>Group: {{group.name}}</h1>
+    {% if request.user.is_superuser %}
+    <a href="/adminhome">Site Manager</a>
+    {% endif %}
+    <a href="/userpage">Home</a>
+    <a href="/logout">Logout</a>
+    <h2>Members:</h2>
+    {% for user in users %}
+        <ul>{{user.username}}</ul>
+    {% endfor %}
+    <h2>Reports associated with this group:</h2>
+    {% for report in reports %}
+        <ul>{{report.report_title}}</ul>
+    {% endfor %}
+
+    <h2>Add a Member</h2>
+    <form action="{%  url 'viewgroup' %}" method="POST">{% csrf_token %}
+        <p>{{form.as_p}}</p>
+        <button type = "submit" value = "{{group.name}}" name = "view">Add member</button>
+    </form>
+
+</html>
