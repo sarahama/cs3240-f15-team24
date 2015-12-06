@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
     <h1>View Reports</h1>
-    <li><a href="/logout">Logout</a></li>
-    <li><a href="/adminhome">Site Manager home</a></li>
+    <a href="/adminhome">Site Manager</a>
+    <a href="/userpage">Home</a>
+    <a href="/logout">Logout</a>
+    
     <form action="{%  url 'adminreports' %}" method="POST">{% csrf_token %}
         <p><input id = "search" type = "text" name = 'search' value="{{current_name}}">
         <button type = 'submit'>Search</button></p>

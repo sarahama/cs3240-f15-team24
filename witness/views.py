@@ -380,9 +380,9 @@ def admin_edit_user(request):
     elif request.method == 'POST':
         reporterName = request.POST.get("save")
         reporter = Reporter.objects.get(name = reporterName)
-        reporter.name = request.POST.get('name', '')
-        reporter.user.username = request.POST.get('name', '')
-        reporter.user.groups = request.POST.get('groups', '')
+        #reporter.name = request.POST.get('name', '')
+        #reporter.user.username = request.POST.get('name', '')
+        #reporter.user.groups = request.POST.get('groups', '')
         reporter.user.is_active = request.POST.get('is_active', '')
         reporter.user.is_superuser = request.POST.get('is_superuser', '')
         reporter.save()
@@ -394,12 +394,12 @@ def admin_edit_user(request):
 class ReporterForm(ModelForm):
     class Meta:
         model = Reporter
-        fields = ['name']
+        fields = []
 
 class UserEditForm(ModelForm):
     class Meta:
         model = User
-        fields = ['groups', 'is_active', 'is_superuser']
+        fields = ['is_active', 'is_superuser']
 
 def get_Message(request):
     if request.method == 'POST':
@@ -440,7 +440,7 @@ def user_edit_report(request):
             report.report_short_description = request.POST.get('report_short_description', '')
             report.report_long_description = request.POST.get('report_long_description', '')
             report.report_public = request.POST.get('report_public', '')
-            report.report_file_encryption = request.POST.get('report_file_encryption', '')
+            #report.report_file_encryption = request.POST.get('report_file_encryption', '')
             #report.report_file = request.POST.get('report_file', '')
             report.report_group = request.POST.get('report_group', '')
             report.save()
@@ -455,7 +455,7 @@ def user_edit_report(request):
 class ReportEditForm(ModelForm):
     class Meta:
         model = Report
-        fields = ['report_title', 'report_short_description','report_group', 'report_long_description', 'report_public', 'report_file_encryption']
+        fields = ['report_title', 'report_short_description','report_group', 'report_long_description', 'report_public']
 
 def msg3(request):
     if request.method == 'GET':

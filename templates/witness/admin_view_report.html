@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
     <h1>{{report.report_title}}</h1>
-    <li><a href="/logout">Logout</a></li>
+    <a href="/userpage">Home</a>
+    <a href="/logout">Logout</a>
     {% if request.user.is_superuser %}
     <li><a href="/adminhome">Site Manager home</a></li>
     {% endif %}
@@ -12,12 +13,18 @@
     <p>Short description: {{report.report_short_description}}</p>
     <p>Long description: {{report.report_long_description}}</p>
     <p>Files: </p>
+    <ul>
     {%for file in file_list%}
-        <ul>{{file.document}}</ul>
+        {% if file.document_file_encryption %}
+        <li>{{file.document.name}} (encrypted)</li>
+        {% endif %}
+        {% if not file.document_file_encryption %}
+        <li><a href="{{file.document.url}}">{{file.document.name}}</a></li>
+        {% endif %}
     {% endfor %}
+    </ul>
     <p>Created: {{report.report_creation_date}}</p>
     <p>Public: {{report.report_public}}</p>
-    <p>Encrypted?: {{report.report_file_encryption}} </p>
     {% if request.user == report.report_owner %}
         <form action="{%  url 'editreport' %}" method="GET">{% csrf_token %}
         <button type = "submit" value = "{{report.pk}}" name = "edit">Edit</button></li></form>
