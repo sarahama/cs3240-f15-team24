@@ -232,12 +232,20 @@ def user_view_folders(request):
 
 def addgroup(request):
     context = RequestContext(request)
+    added = False
     if request.method == 'POST':
         for group in request.user.groups.all():
             if group.name == request.POST.get('name',''):
+                added = True
                 for user in User.objects.all():
                     if user.username == request.POST.get('member',''):
                         user.groups.add(group)
+        for group in Group.objects.all():
+            if group.name == request.POST.get('name',''):
+                if request.user.is_superuser == True and added == False:
+                    for user in User.objects.all():
+                        if user.username == request.POST.get('member',''):
+                            user.groups.add(group)
         return HttpResponseRedirect("/userpage")
     else:
         addGroup = AddGroup()
