@@ -257,6 +257,7 @@ def grouphome(request):
     if request.method == 'POST':
         pass
     else:
+        groups = []
         if request.user.is_superuser:
             groups = Group.objects.all()
         return render_to_response('witness/grouphome.html', {'groups':groups}, context)
@@ -406,13 +407,14 @@ def admin_view_report(request):
 
 def admin_edit_user(request):
     context = RequestContext(request)
+    response = ''
     if request.method == 'GET':
         reporterName = request.GET.get('edit','')
         reporter = Reporter.objects.get(name = reporterName)
         user = User.objects.get(username = reporterName)
         form = ReporterForm(instance = reporter)
         form2 = UserEditForm(instance = user)
-        return render_to_response('witness/admin_edit_user.html', { 'reporterName': reporterName, 'form': form, 'form2':form2}, context)
+        return render_to_response('witness/admin_edit_user.html', { 'reporterName': reporterName, 'form': form, 'form2':form2, 'response':response}, context)
     elif request.method == 'POST':
         reporterName = request.POST.get("save")
         reporter = Reporter.objects.get(name = reporterName)
