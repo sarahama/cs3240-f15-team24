@@ -2,13 +2,12 @@
 <html>
         <h1> Secure Witness Site Manager </h1>
     <body>
-        <p><a href="/logout">Logout</a></p>
-        <p><a href="/userpage">Home</a></p>
-        <p><a href="/adminhome">Site Manager home</a></p>
+        <a href="/adminhome">Site Manager</a>
+        <a href="/userpage">Home</a>
+        <a href="/logout">Logout</a>
        <h2>Manage </h2>
-        <ul>
-        <li><a href="{% url 'adminuser' %}">Reporters</a></li>
-        <li><a href="{% url 'adminreports' %}">Reports</a></li>
-        </ul>
+        <ul><a href="{% url 'adminuser' %}">Reporters</a></ul>
+        <ul><a href="{% url 'adminreports' %}">Reports</a></ul>
+        <ul><a href="{% url 'grouphome' %}">Add Members to Groups</a></ul>
     </body>
 </html>

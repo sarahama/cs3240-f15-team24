@@ -14,3 +14,6 @@ class MessageF(forms.ModelForm):
 class AddGroup(forms.Form):
 	name = forms.CharField(label="Group Name")
 	member = forms.CharField(label="User to add")
+
+class AddMember(forms.Form):
+	member = forms.CharField(label="User to add")

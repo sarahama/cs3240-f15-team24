@@ -24,12 +24,14 @@ class Report(models.Model):
     #report_file = models.FileField(upload_to = 'media')
     report_files = models.CharField(default = '', max_length = 500)
     report_group = models.CharField(default = '', max_length = 200)
-    report_file_encryption = models.BooleanField(default = False)
+    #report_file_encryption = models.BooleanField(default = False)
 
     def __str__(self):
         return self.report_title
 
 class File(models.Model):
     document = models.FileField(upload_to = 'media')
+    file_name = models.TextField(max_length = 500, default = '')
+    document_file_encryption = models.BooleanField(default = False)
     def __str__(self):
         return self.file_name

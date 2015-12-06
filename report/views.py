@@ -20,6 +20,9 @@ from .forms import FileForm
 from .models import ReportFolder
 from .forms import ReportFolderForm
 from django.contrib.auth.models import Group
+import os
+import mimetypes
+from securewitness import settings
 
 
 def createReport(request):
@@ -42,12 +45,12 @@ def createReport(request):
         report_group = request.POST.get('report_group', '')
         report_public = request.POST.get('report_public', '')
         #report_file = request.FILES['report_file']
-        report_file_encryption = request.POST.get('report_file_encryption', '')
+        #report_file_encryption = request.POST.get('report_file_encryption', '')
         #report_file = request.POST.get('report_file', '')
         #create the report
         newreport = Report(report_title = report_title, report_short_description = report_short_description, 
                 report_long_description = report_long_description, report_creation_date = timezone.now(),
-                report_owner = report_owner, report_group = report_group, report_public = report_public, report_files = '', report_file_encryption = report_file_encryption)
+                report_owner = report_owner, report_group = report_group, report_public = report_public, report_files = '')
         newreport.save()
         return HttpResponseRedirect("/userpage")
     else:
@@ -111,7 +114,8 @@ def addFiles(request):
 
         elif request.POST.get('add',''):
             report_file = request.FILES['document']
-            newFile = File(document = report_file)
+            file_encryption = (request.POST.get('document_file_encryption', '') == 'on')
+            newFile = File(document = report_file, document_file_encryption = file_encryption)
             newFile.save()
             file_pk = newFile.pk
             report_pk = request.POST.get('add', '')
@@ -129,4 +133,11 @@ def addFiles(request):
                     file_list.append(f2)
         form = FileForm()
         return render_to_response('reports/addfiles.html', {'report': report, 'form':form, 'file_list':file_list}, context)
+
+
+
+def list(request):
+    documents = File.objects.all()
+    return render_to_response('reports/download_file.html', {'documents':documents}, context_instance = RequestContext(request))
+
 

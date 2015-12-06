@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		{% if documents %}
+			<ul> 
+				{% for i in documents %}
+				<li><a href="{{i.document.url}}">{{i.document.name}}</a></li>
+			</ul>
+				{% endfor %}
+		{% endif %}
+
+
+    </body>
+
+
+</html>

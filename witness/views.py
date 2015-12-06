@@ -25,6 +25,7 @@ from django.views.generic.edit import UpdateView
 from django.forms import ModelForm
 from .ecryption import encrypt
 from .ecryption import decrypt
+from .forms import AddMember
 from report.forms import ReportForm
 from report.models import ReportFolder
 from itertools import chain
@@ -230,34 +231,61 @@ def user_view_folders(request):
         return render_to_response('witness/user_folders.html', {'folderList':folders}, context)
 
 
-def addgroup(request):
-    context = RequestContext(request)
-    added = False
-    if request.method == 'POST':
-        for group in request.user.groups.all():
-            if group.name == request.POST.get('name',''):
-                added = True
-                for user in User.objects.all():
-                    if user.username == request.POST.get('member',''):
-                        user.groups.add(group)
-        for group in Group.objects.all():
-            if group.name == request.POST.get('name',''):
-                if request.user.is_superuser == True and added == False:
-                    for user in User.objects.all():
-                        if user.username == request.POST.get('member',''):
-                            user.groups.add(group)
-        return HttpResponseRedirect("/userpage")
-    else:
-        addGroup = AddGroup()
-        return render_to_response('witness/addgroup.html', {'addGroup':addGroup}, context)
+# def addgroup(request):
+#     context = RequestContext(request)
+#     added = False
+#     if request.method == 'POST':
+#         for group in request.user.groups.all():
+#             if group.name == request.POST.get('name',''):
+#                 added = True
+#                 for user in User.objects.all():
+#                     if user.username == request.POST.get('member',''):
+#                         user.groups.add(group)
+#         for group in Group.objects.all():
+#             if group.name == request.POST.get('name',''):
+#                 if request.user.is_superuser == True and added == False:
+#                     for user in User.objects.all():
+#                         if user.username == request.POST.get('member',''):
+#                             user.groups.add(group)
+#         return HttpResponseRedirect("/userpage")
+#     else:
+#         addGroup = AddGroup()
+#         return render_to_response('witness/addgroup.html', {'addGroup':addGroup}, context)
 
 def grouphome(request):
     context = RequestContext(request)
     if request.method == 'POST':
         pass
     else:
-        return render_to_response('witness/grouphome.html', context)
+        if request.user.is_superuser:
+            groups = Group.objects.all()
+        return render_to_response('witness/grouphome.html', {'groups':groups}, context)
 	
+def user_view_group(request):
+    context = RequestContext(request)
+    if request.method == 'GET':
+        name = request.GET.get('view','')
+        group = Group.objects.get(name = name)
+        users = group.user_set.all()
+        reports = []
+        if Report.objects.filter(report_group__exact = name).exists():
+            reports = Report.objects.filter(report_group__exact = name)
+        form = AddMember()
+        return render_to_response('witness/user_view_group.html', {'group':group, 'users':users, 'reports':reports, 'form':form}, context)
+    if request.method == 'POST':
+        name = request.POST.get('view','')
+        group = Group.objects.get(name = name)
+        for user in User.objects.all():
+            if user.username == request.POST.get('member',''):
+                user.groups.add(group)
+        users = group.user_set.all()
+        reports = []
+        if Report.objects.filter(report_group__exact = name).exists():
+            reports = Report.objects.filter(report_group__exact = name)
+        form = AddMember()
+        return render_to_response('witness/user_view_group.html', {'group':group, 'users':users, 'reports':reports, 'form':form}, context)
+
+
 def creategroup(request):
     context = RequestContext(request)
     if request.method == 'POST':
@@ -388,9 +416,9 @@ def admin_edit_user(request):
     elif request.method == 'POST':
         reporterName = request.POST.get("save")
         reporter = Reporter.objects.get(name = reporterName)
-        reporter.name = request.POST.get('name', '')
-        reporter.user.username = request.POST.get('name', '')
-        reporter.user.groups = request.POST.get('groups', '')
+        #reporter.name = request.POST.get('name', '')
+        #reporter.user.username = request.POST.get('name', '')
+        #reporter.user.groups = request.POST.get('groups', '')
         reporter.user.is_active = request.POST.get('is_active', '')
         reporter.user.is_superuser = request.POST.get('is_superuser', '')
         reporter.save()
@@ -402,12 +430,12 @@ def admin_edit_user(request):
 class ReporterForm(ModelForm):
     class Meta:
         model = Reporter
-        fields = ['name']
+        fields = []
 
 class UserEditForm(ModelForm):
     class Meta:
         model = User
-        fields = ['groups', 'is_active', 'is_superuser']
+        fields = ['is_active', 'is_superuser']
 
 def get_Message(request):
     if request.method == 'POST':
@@ -448,7 +476,7 @@ def user_edit_report(request):
             report.report_short_description = request.POST.get('report_short_description', '')
             report.report_long_description = request.POST.get('report_long_description', '')
             report.report_public = request.POST.get('report_public', '')
-            report.report_file_encryption = request.POST.get('report_file_encryption', '')
+            #report.report_file_encryption = request.POST.get('report_file_encryption', '')
             #report.report_file = request.POST.get('report_file', '')
             report.report_group = request.POST.get('report_group', '')
             report.save()
@@ -463,7 +491,7 @@ def user_edit_report(request):
 class ReportEditForm(ModelForm):
     class Meta:
         model = Report
-        fields = ['report_title', 'report_short_description','report_group', 'report_long_description', 'report_public', 'report_file_encryption']
+        fields = ['report_title', 'report_short_description','report_group', 'report_long_description', 'report_public']
 
 def msg3(request):
     if request.method == 'GET':

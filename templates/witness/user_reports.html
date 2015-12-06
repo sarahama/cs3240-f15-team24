@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
     <h1>View Reports</h1>
-    <li><a href="/logout">Logout</a></li>
-    <ul><a href="/userpage">Home</a></ul>
+    <a href="/userpage">Home</a>
+    <a href="/logout">Logout</a>
+    
     <form action="{%  url 'userreports' %}" method="POST">{% csrf_token %}
         <p><input id = "search" type = "text" name = 'search' value="{{current_name}}">
         <button type = 'submit'>Search</button></p>
