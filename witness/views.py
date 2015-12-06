@@ -23,8 +23,8 @@ from report.models import Report
 from report.models import File
 from django.views.generic.edit import UpdateView
 from django.forms import ModelForm
-from .ecryption import encrypt
-from .ecryption import decrypt
+#from .ecryption import encrypt
+#from .ecryption import decrypt
 from .forms import AddMember
 from report.forms import ReportForm
 from report.models import ReportFolder
@@ -447,7 +447,7 @@ def get_Message(request):
             message = request.POST.get('message','')
             if 'encmsg' in request.POST:
                 #message = str(message)
-                message = encrypt(message, "testing", "moretesting")
+                #message = encrypt(message, "testing", "moretesting")
                 message = str(message)
             #user = request.user.username
             newmsg = MessageM(reader = reader, message = message)
