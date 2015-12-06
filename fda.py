@@ -12,8 +12,8 @@ password = input("Enter password: ")
 
 for user in User.objects.all():
     if user.username == username:
-	    print("Welcome " + user.username + "!")
-        print("Your reports: \n")
+        print("Welcome " + user.username + "!")
+        print("Your reports:")
         for report in Report.objects.all():
             if report.report_owner == user:
                 print(str(report))
