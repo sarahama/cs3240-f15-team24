@@ -111,7 +111,7 @@ STATIC_URL = '/static/'
 
 # Parse database configuration from $DATABASE_URL
 import dj_database_url
-DATABASES['default'] =  dj_database_url.config()
+DATABASES['default'] =  dj_database_url.config(default='link/to/database/')
 #DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql_psycopg2'
 #DATABASES['default']['NAME'] = 'mydb10'
 #DATABASES['default']['USER'] = 'postgres'
