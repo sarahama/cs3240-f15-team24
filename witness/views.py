@@ -520,7 +520,8 @@ def get_Message(request):
             public_key = RSA.importKey(key)
             #encode the message
             enc_data = secret_string(message, public_key)
-            message = str(enc_data)
+            message = base64.b64encode(enc_data)
+            print(message)
          
         newmsg = MessageM(reader = reader, message = message, author = username)
         newmsg.save()
@@ -589,15 +590,22 @@ def msg3(request):
 def decipher(request):
     if request.method == 'POST':
         key = request.POST.get('key','')
+        key = key.replace('-----BEGIN RSA PRIVATE KEY-----','')
+        key = key.replace('----END RSA PRIVATE KEY-----','')
+        key = key.replace(' ','\n')
+        key = '-----BEGIN RSA PRIVATE KEY-----\n' + key + '\n----END RSA PRIVATE KEY-----'
         #f = open(file_name,'rb')
         #key = RSA.importKey(f.read())
         
         private_key = RSA.importKey(key) #transform back to the private key
         mess_pk = request.POST.get("message",'')
         message = MessageM.objects.get(pk = mess_pk) #get the message we are decrypting
+        print(message.message)
         enc_mess = message.message
+        enc_mess = base64.b64decode(enc_mess)
+        print(enc_mess)
         #hand to the decode method
-        dec_mess = decode_string(enc_mess, key)
+        dec_mess = decode_string(enc_mess, private_key)
         return render(request, 'witness/decipher.html', {'decoded': True, 'dec_mess':dec_mess})
     else:
         return render(request, 'witness/decipher.html', {'decoded':False})
@@ -684,11 +692,12 @@ def secret_string(s, key):
      then returns resulting string"""
     s_e = s.encode()
     enc_data = key.encrypt(s_e, 32)[0] #retrieves the string from the returned tuple
-    #print ('encrypted: ', enc_data)
+    print ('encrypted: ', enc_data)
     return enc_data
 
 def decode_string(s, key):
+    #b = bytes(s, 'utf-8')
     dec_data = key.decrypt(s)
-    #print('decoded: ', dec_data)
+    #print('decoded: ', dec_data.decode())
+    #return(dec_data)
     return(dec_data)
-
