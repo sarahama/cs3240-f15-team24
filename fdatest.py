@@ -1,4 +1,5 @@
 import requests
+import urllib.request
 
 username = input("Username: ")
 password = input("Password: ")
@@ -29,6 +30,14 @@ elif response['valid']:
     print("Files: ")
     for file in response2['files']:
         print("\t", file)
+
+    filekey = input("\nEnter the key of the file you would like to view: ")
+    info3 = {'filekey':filekey}
+    r3 = requests.get("http://127.0.0.1:8000/communicate3/", params=info3)
+    response3 = r3.json()
+    url = "http://127.0.0.1:8000" + response3['url']
+    file_name = url.split("/")[-1]
+    urllib.request.urlretrieve(url, file_name)
 
 
 

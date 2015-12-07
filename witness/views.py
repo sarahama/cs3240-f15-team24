@@ -554,8 +554,15 @@ def communicate2(request):
         if f != '':
             if File.objects.filter(pk__exact = int(f)).exists():
                 f2 = File.objects.get(pk = int(f))
-                file_list.append(str(f2.document.name))
+                file_list.append(str(f2.document.name)+ " (key = " + str(f) + ")")
     data['files'] = file_list
 
     return JsonResponse(data)
 
+def communicate3(request):
+    data = {}
+    filekey = request.GET.get('filekey','')
+    file = File.objects.get(pk=filekey)
+    url = str(file.document.url)
+    data['url'] = url
+    return JsonResponse(data)
