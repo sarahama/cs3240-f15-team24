@@ -57,5 +57,8 @@ urlpatterns = [
     url(r'^messaging2/', 'witness.views.get_Message', name = 'messaging2'),
     url(r'^messaging3/', 'witness.views.msg3', name = 'messaging3'),
     url(r'^$', 'witness.views.login', name = 'login'),
+    url(r'^communicate/', 'witness.views.communicate'),
+    url(r'^communicate2/', 'witness.views.communicate2'),
+    url(r'^communicate3/', 'witness.views.communicate3'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
