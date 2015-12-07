@@ -11,6 +11,8 @@ def decrypt_file(in_filename, key):
                 chunk = in_file.read(1024)
                 if len(chunk) == 0:
                     break
+                elif len(chunk) % 16 != 0:
+                    chunk += b' ' * (16 - len(chunk) % 16)
                 out_file.write(aes.decrypt(chunk))
 
 username = input("Username: ")
