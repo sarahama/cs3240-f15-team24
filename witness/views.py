@@ -29,6 +29,8 @@ from .forms import AddMember
 from report.forms import ReportForm
 from report.models import ReportFolder
 from itertools import chain
+import json
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -501,4 +503,59 @@ def msg3(request):
         return render(request, 'witness/messaging3.html', {'results': results})
     else:
         return HttpResponseRedirect("/userpage")
+
+def communicate(request):
+    data = {}
+    username = request.GET.get('username','')
+    password = request.GET.get('password', '')
+    user = auth.authenticate(username=username, password = password)
+    if user is not None:
+        data['valid'] = user.is_active
+        #get all of the reports this user has access to
+        reports = Report.objects.filter(report_owner__exact = user)
+        all_reports = Report.objects.all()
+        access = []
+        for report in all_reports:
+            group_name = report.report_group
+            #add the report if the user is an a group that can view the report
+            if user.groups.filter(name = group_name).exists() and report not in reports:
+                access.append(report)
+            #add the report if it is public
+            if report.report_public and report not in reports and report not in access:
+                access.append(report)
+        final = list(chain(reports, access)) 
+        report_list = []
+        for report in final:
+            entry =  report.report_title + " (key = " + str(report.pk) + ")"
+            report_list.append(entry)
+        data['reports'] = report_list
+    else:
+        data['valid'] = False
+    data['username'] = username
+    data['password'] = password
+
+    return JsonResponse(data)
+
+def communicate2(request):
+    data = {}
+    key = request.GET.get('key','')
+    report = Report.objects.get(pk = key)
+
+    data['report_title'] = report.report_title
+    data['report_short_description'] = report.report_short_description
+    data['report_long_description'] = report.report_long_description
+    data['report_creation_date'] = str(report.report_creation_date)
+    data['report_owner'] = report.report_owner.username
+    data['report_public'] = str(report.report_public)
+    
+    files = report.report_files.split(',')
+    file_list = []
+    for f in files:
+        if f != '':
+            if File.objects.filter(pk__exact = int(f)).exists():
+                f2 = File.objects.get(pk = int(f))
+                file_list.append(str(f2.document.name))
+    data['files'] = file_list
+
+    return JsonResponse(data)
 
