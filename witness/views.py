@@ -74,11 +74,38 @@ def user_reports(request):
             access = []
             for report in all_reports:
                 group_name = report.report_group
+                for r in reports:
+                    if r not in access:
+                        access.append(r)
                 #add the report if the user is an a group that can view the report
                 if request.user.groups.filter(name = group_name).exists() and report not in reports:
                     access.append(report) 
                 #add the report if it is public
                 if report.report_public and report not in reports and report not in access:
+                    access.append(report)
+
+            reports_short = Report.objects.filter(report_short_description__contains = search, report_owner__exact = request.user)
+            all_reports_short = Report.objects.filter(report_short_description__contains = search)
+            for report in all_reports_short:
+                group_name = report.report_group
+                for r in reports_short:
+                    if r not in access:
+                        access.append(r)
+                if request.user.groups.filter(name = group_name).exists() and report not in reports_short:
+                    access.append(report) 
+                if report.report_public and report not in reports_short and report not in access:
+                    access.append(report)
+
+            reports_location = Report.objects.filter(report_location__contains = search, report_owner__exact = request.user)
+            all_reports_location = Report.objects.filter(report_location__contains = search)
+            for report in all_reports_location:
+                group_name = report.report_group
+                for r in reports_location:
+                    if r not in access:
+                        access.append(r)
+                if request.user.groups.filter(name = group_name).exists() and report not in reports_location:
+                    access.append(report) 
+                if report.report_public and report not in reports_location and report not in access:
                     access.append(report)
             final = list(chain(reports, access))
             return render_to_response('witness/user_reports.html', {'reportList':final}, context)

@@ -79,9 +79,9 @@ WSGI_APPLICATION = 'securewitness.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'mds4ba',
+        'NAME': 'database13',
 	    'USER': 'postgres',
-	    'PASSWORD': 'syracuse9',
+	    'PASSWORD': '123qwe',
 	    'HOST': 'localhost',
 	    'PORT': '5432',
     }
@@ -113,9 +113,9 @@ STATIC_URL = '/static/'
 import dj_database_url
 DATABASES['default'] =  dj_database_url.config()
 DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql_psycopg2'
-DATABASES['default']['NAME'] = 'securedb'
+DATABASES['default']['NAME'] = 'database13'
 DATABASES['default']['USER'] = 'postgres'
-DATABASES['default']['PASSWORD'] = 'syracuse9'
+DATABASES['default']['PASSWORD'] = '123qwe'
 
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()

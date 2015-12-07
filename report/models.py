@@ -16,6 +16,7 @@ class ReportFolder(models.Model):
 
 class Report(models.Model):
     report_title = models.CharField(max_length=64)
+    report_location = models.CharField(max_length = 150)
     report_short_description = models.TextField(max_length = 500)
     report_long_description = models.TextField(blank = True)
     report_creation_date = models.DateTimeField('date published')
