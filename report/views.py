@@ -41,6 +41,7 @@ def createReport(request):
 
         report_short_description = request.POST.get('report_short_description', '')
         report_long_description = request.POST.get('report_long_description', '')
+        report_location = request.POST.get('report_location', '')
         report_owner = request.user
         report_group = request.POST.get('report_group', '')
         report_public = request.POST.get('report_public', '')
@@ -48,7 +49,7 @@ def createReport(request):
         #report_file_encryption = request.POST.get('report_file_encryption', '')
         #report_file = request.POST.get('report_file', '')
         #create the report
-        newreport = Report(report_title = report_title, report_short_description = report_short_description, 
+        newreport = Report(report_title = report_title, report_location = report_location, report_short_description = report_short_description, 
                 report_long_description = report_long_description, report_creation_date = timezone.now(),
                 report_owner = report_owner, report_group = report_group, report_public = report_public, report_files = '')
         newreport.save()

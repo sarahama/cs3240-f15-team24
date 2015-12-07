@@ -4,6 +4,7 @@ from .models import Report, File, ReportFolder
 
 class ReportForm(forms.Form):
     report_title = forms.CharField(label = 'Report Title', max_length = 100)
+    report_location = forms.CharField(label = 'Location of Incident', max_length = 150)
     report_group = forms.CharField(label = 'Group with access to this report (optional)', max_length = 100)
     report_short_description = forms.CharField(label = 'Short Description', max_length = 100)
     report_long_description = forms.CharField(label = 'Long Description', widget = forms.Textarea)

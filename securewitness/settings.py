@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'securewitness.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'mds4ba',
+        'NAME': 'securedb',
 	    'USER': 'postgres',
 	    'PASSWORD': 'syracuse9',
 	    'HOST': 'localhost',
