@@ -11,8 +11,8 @@
     <tr> 
         <p> <b>Message:</b> {{ i.message }}</p>
         <p> <b>From:</b> {{i.author}} </p>
-    <input type = "checkbox" name = "deletebox" value = "{{ i.pk}}"> Delete?
-    <input type = "checkbox" name = "decryptbox" value = "{{ i.message}}"> Decrypt?
+    <input type = "checkbox" name = "deletebox" value = {{i.pk}} > Delete?
+    <input type = "checkbox" name = "decryptbox" value = {{i.pk}} > Decrypt?
         <br></br>
     </tr>
     {% endif %}

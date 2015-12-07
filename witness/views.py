@@ -41,6 +41,15 @@ import json
 from django.http import JsonResponse
 
 
+from Crypto.PublicKey import RSA
+from Crypto.Hash import SHA256
+from Crypto import Random
+import sys
+
+from Crypto.Cipher import DES
+import os
+
+
 # Create your views here.
 
 def super(request):
@@ -365,6 +374,7 @@ def logout(request):
 
 def register(request):
     context = RequestContext(request) 
+    private_key = ''
     if request.method == 'POST': 
         username = request.POST.get('username', '')
         password = request.POST.get('password', '')
@@ -383,14 +393,23 @@ def register(request):
             if user is not None and user.is_active:
                 #correct password, user is active
                 #create a reporter with the user and log the user in
-                reporter = Reporter(name = username, user = user)
+                #generate their key for encrypting and decrypting
+                random_generator = Random.new().read
+                key = RSA.generate(1024, random_generator)
+                private_key = key.exportKey() #this will be displayed
+                #key = RSA.generate(2048)
+                #f = open('mykey.txt','wb')
+                #f.write(key.exportKey())
+                #f.close()
+                public_key = key.publickey().exportKey() #this will be saved
+                reporter = Reporter(name = username, user = user, public_key = public_key)
                 reporter.save()
                 auth.login(request, reporter.user)
                 #s = smtplib.SMTP('localhost')
                 #s.sendmail("rtb7rd@virginia.edu", "rtb7rd@virginia.edu", "Hello")
                 #s.quit()
                 #direct to success page
-                return HttpResponseRedirect("/userpage")
+                return render_to_response("witness/userpage.html", {'private_key':private_key, 'firstTime':True}, context)
             else:
                 return HttpResponseRedirect("/account/invalid")
                 
@@ -452,13 +471,6 @@ def admin_view_report(request):
         reports = Report.objects.all()
         return render_to_response('witness/admin_reports.html', {'reportList':reports}, context)
 
-"""
-username = request.user.username
-reporter = Reporter.objects.get(name = username)
-reporter_key = reporter.key1
-"""
-
-
 
 
 def admin_edit_user(request):
@@ -500,42 +512,16 @@ def get_Message(request):
         reader = request.POST.get('reader', '')
         message = request.POST.get('message','')
         username = request.user.username
-        if 'encmsg' in request.POST:
-            username = request.user.username
-            reporter = Reporter.objects.get(name = username)
-            key = reporter.key1
-            keyA = key.publickey()
-            #message = str(message)
-            #key = RSA.generate(1024)
-            words = message
-            words = words.encode()
-            message = keyA.encrypt(words, 32)
-            privatek = key.exportKey()
-            print(type(privatek))
-            cipher = RSA.importKey(privatek)
-            #print(ct)
-            dec = cipher.decrypt(message)
-            print (dec, "XXXXXXXXXXXXXXXXXXX")
-            """
-            pub_key = RSA.generate(1024)
-            message2 = message.encode('utf-8')
-            message3 = pub_key.encrypt(message2, 32)[0]
-            message4 = base64.encodestring(message3)
-            #keyDER = b64decode(key2)
-            #private = RSA.importKey(keyDER)
-            #privatek = reporter_key.exportKey()
-            #cipher = RSA.importKey(privatek)
-            print(message4)
-            print(" ------------------------------")
-            print(pub_key.decrypt(message4))
-            message4.decode()
-            print(message4)
-            #pub_key = reporter_key.publickey()
-            #message.encode()
-            #ciphertext = pub_key.encrypt(str(message), 16)
-            #message = encrypt(message, "testing", "moretesting")
-            message = str(message)
-            """
+        if request.POST.get('encmsg','') == "true":
+            #username = request.user.username
+            reporter = Reporter.objects.get(name = reader) #gets the public key of the reader
+            key = reporter.public_key
+            #translate back into an RSA public key
+            public_key = RSA.importKey(key)
+            #encode the message
+            enc_data = secret_string(message, public_key)
+            message = str(enc_data)
+         
         newmsg = MessageM(reader = reader, message = message, author = username)
         newmsg.save()
         results = MessageM.objects.all()
@@ -586,7 +572,7 @@ def msg3(request):
     else:
         if 'deletebox' in request.POST:
             selected_pk = request.POST.get('deletebox','')
-            message = MessageM.objects.filter(pk = selected_pk)
+            message = MessageM.objects.get(pk = selected_pk)
             message.delete()
             #results = MessageM.objects.all()
             #print(selected[0])
@@ -594,7 +580,27 @@ def msg3(request):
             #   todel = MessageM.objects.filter(message=str(selected[x]))
             #   todel.delete()
             #results.delete()
+        elif 'decryptbox' in request.POST:
+            selected_pk = request.POST.get('decryptbox','')
+            message = MessageM.objects.get(pk = selected_pk)
+            return render(request, 'witness/decipher.html', {'message': message})
         return HttpResponseRedirect('witness/messaging3.html')
+
+def decipher(request):
+    if request.method == 'POST':
+        key = request.POST.get('key','')
+        #f = open(file_name,'rb')
+        #key = RSA.importKey(f.read())
+        
+        private_key = RSA.importKey(key) #transform back to the private key
+        mess_pk = request.POST.get("message",'')
+        message = MessageM.objects.get(pk = mess_pk) #get the message we are decrypting
+        enc_mess = message.message
+        #hand to the decode method
+        dec_mess = decode_string(enc_mess, key)
+        return render(request, 'witness/decipher.html', {'decoded': True, 'dec_mess':dec_mess})
+    else:
+        return render(request, 'witness/decipher.html', {'decoded':False})
 
 def keypage(request):
     if request.method == 'GET':
@@ -671,4 +677,18 @@ def communicate3(request):
     data['url'] = url
     data['encrypted'] = encrypted
     return JsonResponse(data)
+
+def secret_string(s, key):
+    """Takes in a string and a public key
+     encrypts the string with said key
+     then returns resulting string"""
+    s_e = s.encode()
+    enc_data = key.encrypt(s_e, 32)[0] #retrieves the string from the returned tuple
+    #print ('encrypted: ', enc_data)
+    return enc_data
+
+def decode_string(s, key):
+    dec_data = key.decrypt(s)
+    #print('decoded: ', dec_data)
+    return(dec_data)
 
