@@ -1,5 +1,5 @@
 <html>
-    <h1> Edit {{report_Title}} </h1>
+    <h1> Edit {{report.report_title}} </h1>
     <ul><a href="/logout">Logout</a></ul>
     <ul><a href="/userpage">Home</a></ul>
     {% if groupInvalid %}
@@ -11,7 +11,7 @@
     <form action="{%  url 'editreport' %}" method="POST">{% csrf_token %}
         <p>{{form}}</p>
         {% if response != 'Report updated successfully' %}
-        <button type="submit" value= '{{report_Title}}' name = "save">Save changes</button>
+        <button type="submit" value= '{{report.pk}}' name = "save">Save changes</button>
         {% endif %}
     </form>
     

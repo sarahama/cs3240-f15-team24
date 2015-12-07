@@ -1,28 +1,43 @@
 <!DOCTYPE html>
 <html>
-    <h1>{{reportTitle}}</h1>
-    <li><a href="/logout">Logout</a></li>
+    <h1>{{report.report_title}}</h1>
     {% if request.user.is_superuser %}
-    <li><a href="/adminhome">Admin home</a></li>
+    <a href="/adminhome">Site Manager</a>
     {% endif %}
-    <p>Title: {{reportTitle}}</p>
-    {% if reportGroup != '' %}
-    <p>The group {{reportGroup}} has access to this report </p>
+    <a href="/userpage">Home</a>
+    <a href="/logout">Logout</a>
+    
+    <p>Title: {{report.report_title}}</p>
+    {% if report.report_group != '' %}
+    <p>The group {{report.report_group}} has access to this report </p>
     {% endif %}
-    <p>Short description: {{reportShort}}</p>
-    <p>Long description: {{reportLong}}</p>
-    <p>Created: {{created}}</p>
-    <p>Public: {{public}}</p>
-    <p>File: {{document}} </p>
-    <p>Encrypted?: {{encrypt}} </p>
-    {% if request.user == owner %}
+    <p>Owner: {{report.report_owner}}</p>
+    <p>Location of Incident: {{report.report_location}} </p>
+    <p>Short description: {{report.report_short_description}}</p>
+    <p>Long description: {{report.report_long_description}}</p>
+    <p>Files: </p>
+    <ul>
+    {%for file in file_list%}
+        {% if file.document_file_encryption %}
+        <li>{{file.document.name}} (encrypted)</li>
+        {% endif %}
+        {% if not file.document_file_encryption %}
+        <li><a href="{{file.document.url}}">{{file.document.name}}</a></li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+    <p>Created: {{report.report_creation_date}}</p>
+    <p>Public: {{report.report_public}}</p>
+    {% if request.user == report.report_owner %}
         <form action="{%  url 'editreport' %}" method="GET">{% csrf_token %}
-        <button type = "submit" value = "{{reportTitle}}" name = "edit">Edit</button></li></form>
+        <button type = "submit" value = "{{report.pk}}" name = "edit">Edit</button></li></form>
+        <form action="{%  url 'addfiles' %}" method="GET">{% csrf_token %}
+        <button type = "submit" value = "{{report.pk}}" name = "addfiles">Add files</button></li></form>
     {% endif %}
     
-    {% if request.user == owner or request.user.is_superuser %}
+    {% if request.user == report.report_owner or request.user.is_superuser %}
         <form action = "{% url 'deletedreport' %}" method = "POST">{% csrf_token %}
-        <button type = 'submit' name = 'delete' value = "{{reportTitle}}">Delete report</button></p>
+        <button type = 'submit' name = 'delete' value = "{{report.pk}}">Delete report</button></p>
         </form> 
     {% endif %}
 

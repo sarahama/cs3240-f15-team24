@@ -1,5 +1,26 @@
 <!DOCTYPE html>
 <html>
-    <h1>Group Home Page</h1>
-    <a href="{% url 'userpage' %}">Back</a>
+    <h1>Groups</h1>
+    {% if request.user.is_superuser %}
+    <a href="/adminhome">Site Manager</a>
+    {% endif %}
+    <a href="/userpage">Home</a>
+    <a href="/logout">Logout</a>
+    
+    
+    <ul>
+        {% if request.user.is_superuser %}
+        {% for group in groups %}
+            <form action="{%  url 'viewgroup' %}" method="GET">{% csrf_token %}
+            {{group.name}} <button type = "submit" value = "{{group.name}}" name = "view">View</button> </form>
+        {% endfor %}
+        {% endif %}
+
+        {% if not request.user.is_superuser %}
+        {% for group in request.user.groups.values %}
+            <form action="{%  url 'viewgroup' %}" method="GET">{% csrf_token %}
+            {{group.name}} <button type = "submit" value = "{{group.name}}" name = "view">View</button> </form>
+        {% endfor %}
+        {% endif %}
+    </ul>
 </html>

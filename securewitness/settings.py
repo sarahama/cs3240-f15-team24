@@ -118,6 +118,7 @@ DATABASES['default']['USER'] = 'postgres'
 DATABASES['default']['PASSWORD'] = 'p3ngu1n'
 
 
+
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 

@@ -16,21 +16,23 @@ class ReportFolder(models.Model):
 
 class Report(models.Model):
     report_title = models.CharField(max_length=64)
+    report_location = models.CharField(max_length = 150)
     report_short_description = models.TextField(max_length = 500)
     report_long_description = models.TextField(blank = True)
     report_creation_date = models.DateTimeField('date published')
     report_owner = models.ForeignKey('auth.User')
     report_public = models.BooleanField(default = False)
-    report_file = models.FileField(upload_to = 'media')
+    #report_file = models.FileField(upload_to = 'media')
+    report_files = models.CharField(default = '', max_length = 500)
     report_group = models.CharField(default = '', max_length = 200)
-    report_file_encryption = models.BooleanField(default = False)
+    #report_file_encryption = models.BooleanField(default = False)
 
-    #report_folder = models.ForeignKey(ReportFolder)
     def __str__(self):
         return self.report_title
 
 class File(models.Model):
-    report = models.ForeignKey(Report)
-    document = models.FileField(upload_to = 'documents/%Y/%m/%d', default= 'unknown')
+    document = models.FileField(upload_to = 'media')
+    file_name = models.TextField(max_length = 500, default = '')
+    document_file_encryption = models.BooleanField(default = False)
     def __str__(self):
         return self.file_name

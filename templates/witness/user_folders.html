@@ -11,7 +11,7 @@
         <ul>
             {% for folder in folderList %}
             <form action="{%  url 'userviewfolders' %}" method="GET">{% csrf_token %}
-            {{folder.folder_title}} <button type = "submit" value = "{{folder.folder_title}}" name = "view">View</button> </form>
+            {{folder.folder_title}} <button type = "submit" value = "{{folder.pk}}" name = "view">View</button> </form>
             {% endfor %}
         </ul>
 </html>

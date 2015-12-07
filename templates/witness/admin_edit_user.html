@@ -1,11 +1,13 @@
 <html>
-        <h1> Edit {{reporterName}} </h1>
+    <h1> Edit {{reporterName}} </h1>
     <ul><a href="/logout">Logout</a></ul>
-    <ul><a href="/adminhome">Admin Home</a></ul>
+    <ul><a href="/adminhome">Site Manager Home</a></ul>
     <form action="{%  url 'edituser' %}" method="POST">{% csrf_token %}
         <p>{{form}}</p>
         <p>{{form2}}</p>
+        {% if response == '' %}
         <button type="submit" value= '{{reporterName}}' name = "save">Save</button>
+        {% endif %}
     </form>
         <p>{{response}}</p>
 </html>
