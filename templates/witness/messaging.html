@@ -1,13 +1,6 @@
 <form action="/messaging2/" method="post">
     {% csrf_token %}
-    {{ message.reader.label }}
-    <br></br>
-    {{ message.reader }}
-    <br></br>
-    {{ message.message.label }}
-    <br></br>
-    {{ message.message }}
-    <br></br>
+    {{message}}
     Encrypt? <input type = "checkbox" name = "encmsg">
     <br></br>
        <input type="submit" value="Submit" />

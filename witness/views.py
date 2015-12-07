@@ -497,50 +497,49 @@ class UserEditForm(ModelForm):
 
 def get_Message(request):
     if request.method == 'POST':
-        message1 = MessageF(request.POST)
-        if message1.is_valid():
-            reader = request.POST.get('reader', '')
-            message = request.POST.get('message','')
-            if 'encmsg' in request.POST:
-                username = request.user.username
-                reporter = Reporter.objects.get(name = username)
-                key = reporter.key1
-                keyA = key.publickey()
-                #message = str(message)
-                #key = RSA.generate(1024)
-                words = message
-                words = words.encode()
-                message = keyA.encrypt(words, 32)
-                privatek = key.exportKey()
-                print(type(privatek))
-                cipher = RSA.importKey(privatek)
-                #print(ct)
-                dec = cipher.decrypt(message)
-                print (dec, "XXXXXXXXXXXXXXXXXXX")
-                """
-                pub_key = RSA.generate(1024)
-                message2 = message.encode('utf-8')
-                message3 = pub_key.encrypt(message2, 32)[0]
-                message4 = base64.encodestring(message3)
-                #keyDER = b64decode(key2)
-                #private = RSA.importKey(keyDER)
-                #privatek = reporter_key.exportKey()
-                #cipher = RSA.importKey(privatek)
-                print(message4)
-                print(" ------------------------------")
-                print(pub_key.decrypt(message4))
-                message4.decode()
-                print(message4)
-                #pub_key = reporter_key.publickey()
-                #message.encode()
-                #ciphertext = pub_key.encrypt(str(message), 16)
-                #message = encrypt(message, "testing", "moretesting")
-                message = str(message)
-                """
-            newmsg = MessageM(reader = reader, message = message)
-            newmsg.save()
-            results = MessageM.objects.all()
-            return render(request, 'witness/messaging2.html', {'reader': reader, 'message': message, 'results': results})
+        reader = request.POST.get('reader', '')
+        message = request.POST.get('message','')
+        username = request.user.username
+        if 'encmsg' in request.POST:
+            username = request.user.username
+            reporter = Reporter.objects.get(name = username)
+            key = reporter.key1
+            keyA = key.publickey()
+            #message = str(message)
+            #key = RSA.generate(1024)
+            words = message
+            words = words.encode()
+            message = keyA.encrypt(words, 32)
+            privatek = key.exportKey()
+            print(type(privatek))
+            cipher = RSA.importKey(privatek)
+            #print(ct)
+            dec = cipher.decrypt(message)
+            print (dec, "XXXXXXXXXXXXXXXXXXX")
+            """
+            pub_key = RSA.generate(1024)
+            message2 = message.encode('utf-8')
+            message3 = pub_key.encrypt(message2, 32)[0]
+            message4 = base64.encodestring(message3)
+            #keyDER = b64decode(key2)
+            #private = RSA.importKey(keyDER)
+            #privatek = reporter_key.exportKey()
+            #cipher = RSA.importKey(privatek)
+            print(message4)
+            print(" ------------------------------")
+            print(pub_key.decrypt(message4))
+            message4.decode()
+            print(message4)
+            #pub_key = reporter_key.publickey()
+            #message.encode()
+            #ciphertext = pub_key.encrypt(str(message), 16)
+            #message = encrypt(message, "testing", "moretesting")
+            message = str(message)
+            """
+        newmsg = MessageM(reader = reader, message = message, author = username)
+        newmsg.save()
+        results = MessageM.objects.all()
+        return render(request, 'witness/messaging2.html', {'reader': reader, 'message': message, 'results': results, 'username':username})
     else:
         message = MessageF()
         return render(request, 'witness/messaging.html', {'message': message})            
@@ -586,13 +585,15 @@ def msg3(request):
         return render(request, 'witness/messaging3.html', {'results': results})
     else:
         if 'deletebox' in request.POST:
-            selected = request.POST.getlist('deletebox')
-            results = MessageM.objects.all()
-            print(selected[0])
-            for x in range(0, len(selected)):
-                todel = MessageM.objects.filter(message=str(selected[x]))
-                todel.delete()
-            results.delete()
+            selected_pk = request.POST.get('deletebox','')
+            message = MessageM.objects.filter(pk = selected_pk)
+            message.delete()
+            #results = MessageM.objects.all()
+            #print(selected[0])
+            #for x in range(0, len(selected)):
+            #   todel = MessageM.objects.filter(message=str(selected[x]))
+            #   todel.delete()
+            #results.delete()
         return HttpResponseRedirect('witness/messaging3.html')
 
 def keypage(request):

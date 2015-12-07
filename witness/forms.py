@@ -6,10 +6,9 @@ class CreateGroupForm(forms.Form):
 	name = forms.CharField(label="Group Name")
 
 
-class MessageF(forms.ModelForm):
-	class Meta:
-		model = MessageM
-		fields = "__all__"
+class MessageF(forms.Form):
+	reader = forms.CharField(label = 'Send to', max_length = 100)
+	message = forms.CharField(label = 'Message', widget = forms.Textarea)
 
 class AddGroup(forms.Form):
 	name = forms.CharField(label="Group Name")

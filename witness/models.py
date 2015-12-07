@@ -16,5 +16,6 @@ class MessageM(models.Model):
 	#user = models.OneToOneField(User)
 	reader = models.CharField(max_length=40)
 	message = models.TextField()
+	author = models.CharField(max_length = 50, default= 'nameless')
 	def __str__(self):
 		return self.reader

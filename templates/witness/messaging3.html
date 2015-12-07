@@ -1,18 +1,22 @@
+<!DOCTYPE html>
+<html>
+     <h1>Your Messages</h1>
+    <p><a href="/logout">Logout</a>
+    <a href="/userpage">Home</a></p>
+
 <form action="/messaging3/" method="post">
     {% csrf_token %}
-    <br><b>User:</b></br>
-    {{request.user.username}}
-    <br><b>Your Messages:</b></br>
     {% for i in results %}
     {% if request.user.username == i.reader %}
     <tr> 
-        <td>{{ i.message }}</td>
-    <input type = "checkbox" name = "deletebox" value = "{{ i.message}}"> Delete?
+        <p> <b>Message:</b> {{ i.message }}</p>
+        <p> <b>From:</b> {{i.author}} </p>
+    <input type = "checkbox" name = "deletebox" value = "{{ i.pk}}"> Delete?
     <input type = "checkbox" name = "decryptbox" value = "{{ i.message}}"> Decrypt?
         <br></br>
     </tr>
     {% endif %}
     {% endfor %}
     <input type="submit" value="Ok" />
-    <ul><a href="/userpage">Home</a></ul>
 </form>
+</html>
