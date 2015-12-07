@@ -7,7 +7,7 @@ from Crypto.PublicKey import RSA
 class Reporter(models.Model):
     user = models.OneToOneField(User)
     name = models.CharField(max_length = 50, default= 'nameless')
-    key1 = RSA.generate(1024)
+    public_key = models.CharField(max_length = 1000, default= 'blank')
     def __str__(self):
         return self.name
 

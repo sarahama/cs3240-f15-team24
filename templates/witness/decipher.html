@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<h1>Decipher your message</h1>
+<div id="content-main">
+{% if not decoded %}
+<form action="/decipher/" method="POST" id="decipher">{% csrf_token %}
+  <label for="key">Enter your private key: </label>
+  <input id = "key" type = "textarea" name = "key" value="{{current_key}}">
+  <button type="submit" name = "message" value = {{message.pk}}>Decode</button>
+</form>
+  </div>
+ {% endif %}
+ <p>{{dec_mess}}</p> 
+</div>
+
+</html>

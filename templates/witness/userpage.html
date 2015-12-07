@@ -6,6 +6,12 @@
     <a href="/userpage">Home</a>
     <a href="/logout">Logout</a>
     
+    {% if firstTime %}
+        <div>
+        <p><b>Important!! Save this private key in a safe location. You will use it to decrypt messages from other users. This will not be displayed again</b></p>
+        <p>{{private_key}}</p>
+        </div>
+    {% endif %}
     
     <body>
         <h2> Your Messages: </h2>
@@ -29,4 +35,7 @@
         <a href="{% url 'createreport' %}">Create Report</a><br><br>
         </ul>
     </body>
+
+
+
 </html>
