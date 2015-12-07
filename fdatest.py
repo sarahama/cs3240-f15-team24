@@ -1,5 +1,17 @@
 import requests
 import urllib.request
+from Crypto.Cipher import AES
+
+def decrypt_file(in_filename, key):
+    out_filename = "DEC_" + in_filename
+    aes = AES.new(key)
+    with open(in_filename, 'rb') as in_file:
+        with open(out_filename, 'wb') as out_file:
+            while True:
+                chunk = in_file.read(1024)
+                if len(chunk) == 0:
+                    break
+                out_file.write(aes.decrypt(chunk))
 
 username = input("Username: ")
 password = input("Password: ")
@@ -38,14 +50,6 @@ elif response['valid']:
     url = "http://127.0.0.1:8000" + response3['url']
     file_name = url.split("/")[-1]
     urllib.request.urlretrieve(url, file_name)
-
-
-
-
-
-
-
-
-
-
-
+    if response3['encrypted']:
+        privatekey = input("Enter the private key to decrypt the file: ")
+        decrypt_file(file_name, privatekey)

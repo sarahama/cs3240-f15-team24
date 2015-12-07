@@ -564,5 +564,7 @@ def communicate3(request):
     filekey = request.GET.get('filekey','')
     file = File.objects.get(pk=filekey)
     url = str(file.document.url)
+    encrypted = file.document_file_encryption
     data['url'] = url
+    data['encrypted'] = encrypted
     return JsonResponse(data)
