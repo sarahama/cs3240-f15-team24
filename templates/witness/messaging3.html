@@ -1,4 +1,4 @@
-<form action="/userpage/" method="post">
+<form action="/messaging3/" method="post">
     {% csrf_token %}
     <br><b>User:</b></br>
     {{request.user.username}}
@@ -7,9 +7,12 @@
     {% if request.user.username == i.reader %}
     <tr> 
         <td>{{ i.message }}</td>
+    <input type = "checkbox" name = "deletebox" value = "{{ i.message}}"> Delete?
+    <input type = "checkbox" name = "decryptbox" value = "{{ i.message}}"> Decrypt?
         <br></br>
     </tr>
     {% endif %}
     {% endfor %}
     <input type="submit" value="Ok" />
+    <ul><a href="/userpage">Home</a></ul>
 </form>

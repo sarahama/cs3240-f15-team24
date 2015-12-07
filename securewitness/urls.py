@@ -50,5 +50,6 @@ urlpatterns = [
     url(r'^messaging/', 'witness.views.get_Message', name = 'messaging'),
     url(r'^messaging2/', 'witness.views.get_Message', name = 'messaging2'),
     url(r'^messaging3/', 'witness.views.msg3', name = 'messaging3'),
+    url(r'^kpage/', 'witness.views.keypage', name = 'kpage'),
     url(r'^$', 'witness.views.home', name='home'),
 ]

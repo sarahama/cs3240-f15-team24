@@ -1,0 +1,11 @@
+<form action="/kpage/" method="post">
+    {% csrf_token %}
+    <br><b>Key:</b></br>
+    {{ pub_key }}
+    <br></br>
+    <br><b>Private Key:</b></br>
+    {{ privkey }}
+    <br></br>
+    <input type="submit" value="Ok" />
+    <ul><a href="/userpage">Home</a></ul>
+</form>

@@ -22,12 +22,16 @@ from django.db import models
 from report.models import Report
 from django.views.generic.edit import UpdateView
 from django.forms import ModelForm
-from .ecryption import encrypt
-from .ecryption import decrypt
+#from .ecryption import encrypt
+#from .ecryption import decrypt
 from report.forms import ReportForm
 from report.models import ReportFolder
 from itertools import chain
-
+from Crypto.PublicKey import RSA
+import base64
+from base64 import b64decode
+import smtplib
+from email.mime.text import MIMEText
 
 # Create your views here.
 
@@ -40,9 +44,15 @@ def home(request):
 def userpage(request):
     #username = get_object_or_404(Reporter, pk=name)
     #return render(request, 'witness/userpage.html')
+    results = MessageM.objects.all()
+    count = 0
+    for i in results:
+        if request.user.username == i.reader:
+            count+=1
+    results = count
     context = RequestContext(request)
     addGroup = AddGroup()
-    return render_to_response('witness/userpage.html', {'addGroup':addGroup}, context)
+    return render_to_response('witness/userpage.html', {'addGroup':addGroup, 'results':results}, context)
 
 def user_reports(request):
     context = RequestContext(request)
@@ -297,6 +307,7 @@ def register(request):
             return render_to_response("witness/register.html", {'username_error': username_error}, context)
 
         elif(password2 == password):
+            #pub_key = key1.publickey()
             user = User.objects.create_user(username=username,email=email, password = password)
             user = authenticate(username=username, password = password)
             #user.save()
@@ -306,6 +317,9 @@ def register(request):
                 reporter = Reporter(name = username, user = user)
                 reporter.save()
                 auth.login(request, reporter.user)
+                #s = smtplib.SMTP('localhost')
+                #s.sendmail("rtb7rd@virginia.edu", "rtb7rd@virginia.edu", "Hello")
+                #s.quit()
                 #direct to success page
                 return HttpResponseRedirect("/userpage")
             else:
@@ -372,6 +386,15 @@ def admin_view_report(request):
         reports = Report.objects.all()
         return render_to_response('witness/admin_reports.html', {'reportList':reports}, context)
 
+"""
+username = request.user.username
+reporter = Reporter.objects.get(name = username)
+reporter_key = reporter.key1
+"""
+
+
+
+
 def admin_edit_user(request):
     context = RequestContext(request)
     if request.method == 'GET':
@@ -412,15 +435,44 @@ def get_Message(request):
             reader = request.POST.get('reader', '')
             message = request.POST.get('message','')
             if 'encmsg' in request.POST:
+                username = request.user.username
+                reporter = Reporter.objects.get(name = username)
+                key = reporter.key1
+                keyA = key.publickey()
                 #message = str(message)
-                message = encrypt(message, "testing", "moretesting")
+                #key = RSA.generate(1024)
+                words = message
+                words = words.encode()
+                message = keyA.encrypt(words, 32)
+                privatek = key.exportKey()
+                print(type(privatek))
+                cipher = RSA.importKey(privatek)
+                #print(ct)
+                dec = cipher.decrypt(message)
+                print (dec, "XXXXXXXXXXXXXXXXXXX")
+                """
+                pub_key = RSA.generate(1024)
+                message2 = message.encode('utf-8')
+                message3 = pub_key.encrypt(message2, 32)[0]
+                message4 = base64.encodestring(message3)
+                #keyDER = b64decode(key2)
+                #private = RSA.importKey(keyDER)
+                #privatek = reporter_key.exportKey()
+                #cipher = RSA.importKey(privatek)
+                print(message4)
+                print(" ------------------------------")
+                print(pub_key.decrypt(message4))
+                message4.decode()
+                print(message4)
+                #pub_key = reporter_key.publickey()
+                #message.encode()
+                #ciphertext = pub_key.encrypt(str(message), 16)
+                #message = encrypt(message, "testing", "moretesting")
                 message = str(message)
-            #user = request.user.username
+                """
             newmsg = MessageM(reader = reader, message = message)
             newmsg.save()
             results = MessageM.objects.all()
-            #messagetest = message.save()
-            #return HttpResponse('Done')
             return render(request, 'witness/messaging2.html', {'reader': reader, 'message': message, 'results': results})
     else:
         message = MessageF()
@@ -469,6 +521,25 @@ def msg3(request):
     if request.method == 'GET':
         results = MessageM.objects.all()
         return render(request, 'witness/messaging3.html', {'results': results})
+    else:
+        if 'deletebox' in request.POST:
+            selected = request.POST.getlist('deletebox')
+            results = MessageM.objects.all()
+            print(selected[0])
+            for x in range(0, len(selected)):
+                todel = MessageM.objects.filter(message=str(selected[x]))
+                todel.delete()
+            results.delete()
+        return HttpResponseRedirect('witness/messaging3.html')
+
+def keypage(request):
+    if request.method == 'GET':
+        username = request.user.username
+        reporter = Reporter.objects.get(name = username)
+        reporter_key = reporter.key1
+        pub_key = reporter_key.publickey()
+        privkey = reporter_key.exportKey()
+        return render(request, 'witness/kpage.html', {'pub_key': pub_key, 'privkey': privkey})
     else:
         return HttpResponseRedirect("/userpage")
 
