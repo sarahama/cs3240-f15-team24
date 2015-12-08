@@ -1,6 +1,5 @@
-{% extends 'Reports/base.html' %}
-
-{% block content %}
+<!DOCTYPE html>
+<html>
  
     <h1> Add Files to {{report.report_title}}</h1>
     <form action="{%  url 'addfiles' %}" method="POST">{% csrf_token %}
@@ -17,5 +16,4 @@
     <form action="{%  url 'userpage' %}" method="POST" >{% csrf_token %}
             <button type = "submit" >Save</button>
     </form>  
-
-{% endblock %}
+</html>

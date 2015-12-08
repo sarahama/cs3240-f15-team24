@@ -1,6 +1,7 @@
-{% extends 'Reports/base.html' %}
 
-{% block content %}
+
+<!DOCTYPE html>
+<html>
  
     <h1> Create Report </h1>
     {% if groupInvalid %}
@@ -14,4 +15,5 @@
     {{ form.as_p }}
     <button type = "submit" class "save btn btn-default"> Save </button>
     </form>
-{% endblock %}
+
+</html>
