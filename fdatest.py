@@ -18,7 +18,7 @@ def decrypt_file(in_filename, key):
 username = input("Username: ")
 password = input("Password: ")
 info = {'username': username, 'password':password}
-r = requests.get("http://127.0.0.1:8000/communicate/", params=info)
+r = requests.get("https://limitless-mesa-7116.herokuapp.com/communicate/", params=info)
 response = r.json()
 if not response['valid']:
     print("Invalid username and password")
@@ -32,7 +32,7 @@ elif response['valid']:
 
     key = input("\nEnter the key of the report you would like to view: ")
     info2 = {'key':key}
-    r2 = requests.get("http://127.0.0.1:8000/communicate2/", params=info2)
+    r2 = requests.get("https://limitless-mesa-7116.herokuapp.com/communicate2/", params=info2)
     response2 = r2.json()
     print()
     print("Title: ", response2['report_title'])
@@ -47,9 +47,9 @@ elif response['valid']:
 
     filekey = input("\nEnter the key of the file you would like to view: ")
     info3 = {'filekey':filekey}
-    r3 = requests.get("http://127.0.0.1:8000/communicate3/", params=info3)
+    r3 = requests.get("https://limitless-mesa-7116.herokuapp.com/communicate3/", params=info3)
     response3 = r3.json()
-    url = "http://127.0.0.1:8000" + response3['url']
+    url = "https://limitless-mesa-7116.herokuapp.com/" + response3['url']
     file_name = url.split("/")[-1]
     urllib.request.urlretrieve(url, file_name)
     if response3['encrypted']:
